@@ -13,8 +13,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   curl -fsSL "$MACOS_ARTIFACT" --output /tmp/boilerplato.output.tar.xz
   tar -xf /tmp/boilerplato.output.tar.xz -C /usr/local/bin/
   rm -rf /tmp/boilerplato.output.tar.xz
-elif [[ "$OSTYPE" == "freebsd"* ]]; then
-  echo "Freebsd artifacts not found"
 else
   echo "Unknown target"
 fi

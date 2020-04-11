@@ -17,12 +17,13 @@ github-release upload \
     --user boilerplato \
     --repo boilerplato \
     --tag v1.0.0 \
-    --name "boilerplato-v1.0.0-x86_64-apple-darwin.tar.xz" \
-    --file dist/boilerplato-v1.0.0-x86_64-apple-darwin.tar.xz
+    --name "boilerplato-v1.0.0-x86_64-unknown-linux-gnu.tar.xz" \
+    --file dist/boilerplato-v1.0.0-x86_64-unknown-linux-gnu.tar.xz
 
 github-release upload \
     --user boilerplato \
     --repo boilerplato \
     --tag v1.0.0 \
-    --name "boilerplato-v1.0.0-x86_64-unknown-linux-gnu.tar.xz" \
-    --file dist/boilerplato-v1.0.0-x86_64-unknown-linux-gnu.tar.xz
+    --name "boilerplato-v1.0.0-x86_64-pc-windows-gnu.zip" \
+    --file dist/boilerplato-v1.0.0-x86_64-pc-windows-gnu.zip
+
