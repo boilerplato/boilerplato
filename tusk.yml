@@ -1,0 +1,25 @@
+tasks:
+  setup:
+    run:
+      - command: cargo install cross
+      - command: go get github.com/aktau/github-release
+  build:macos:
+    run:
+      - command: cargo build --release
+      - command: mkdir -p dist && tar cfJ ./dist/boilerplato-v1.0.0-x86_64-apple-darwin.tar.xz ./target/release/boilerplato
+  build:linux:
+    run:
+      - command: cross build --release --target x86_64-unknown-linux-gnu
+      - command: mkdir -p dist && tar cfJ ./dist/boilerplato-v1.0.0-x86_64-unknown-linux-gnu.tar.xz ./target/x86_64-unknown-linux-gnu/release/boilerplato
+  build:windows:
+    run:
+      - command: cross build --release --target x86_64-pc-windows-gnu
+      - command: mkdir -p dist && zip ./dist/boilerplato-v1.0.0-x86_64-pc-windows-gnu.zip ./target/x86_64-pc-windows-gnu/release/boilerplato.exe
+  build:
+    run:
+      - task: build:macos
+      - task: build:linux
+      - task: build:windows
+  upload-artifacts:
+    run:
+      command: chmod +x scripts/upload-artifacts.sh && ./scripts/upload-artifacts.sh
