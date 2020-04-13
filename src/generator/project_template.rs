@@ -126,6 +126,8 @@ impl ProjectTemplate {
             .output()
             .context("The 'git' command not found")?;
 
+        println!();
+
         if !output.status.success() {
             return Err(crate::Error::new(format!(
                 "The provided template not found: {}",
@@ -219,10 +221,12 @@ impl ProjectTemplate {
             return false;
         };
 
-        println!(
-            "\nCreating a new app in {}\n",
-            project_dir.to_str().unwrap_or("").green()
-        );
+        println!();
+
+        // println!(
+        //     "\nCreating a new app in {}\n",
+        //     project_dir.to_str().unwrap_or("").green()
+        // );
 
         self.walk_template_dir(template_source_dir.as_path(), &ignore_checker, &|entry_full_path| {
             self.gen_a_single_code_file(

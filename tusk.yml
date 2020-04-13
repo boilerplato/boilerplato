@@ -1,3 +1,8 @@
+options:
+  version:
+    usage: The build version
+    short: v
+    required: true
 tasks:
   setup:
     run:
@@ -6,20 +11,26 @@ tasks:
   build:macos:
     run:
       - command: cargo build --release
-      - command: mkdir -p dist && tar cfJ ./dist/boilerplato-v1.0.0-x86_64-apple-darwin.tar.xz ./target/release/boilerplato
+      - command: mkdir -p dist && tar cfJ ./dist/boilerplato-v${version}-x86_64-apple-darwin.tar.xz ./target/release/boilerplato
   build:linux:
     run:
       - command: cross build --release --target x86_64-unknown-linux-gnu
-      - command: mkdir -p dist && tar cfJ ./dist/boilerplato-v1.0.0-x86_64-unknown-linux-gnu.tar.xz ./target/x86_64-unknown-linux-gnu/release/boilerplato
+      - command: mkdir -p dist && tar cfJ ./dist/boilerplato-v${version}-x86_64-unknown-linux-gnu.tar.xz ./target/x86_64-unknown-linux-gnu/release/boilerplato
   build:windows:
     run:
       - command: cross build --release --target x86_64-pc-windows-gnu
-      - command: mkdir -p dist && zip ./dist/boilerplato-v1.0.0-x86_64-pc-windows-gnu.zip ./target/x86_64-pc-windows-gnu/release/boilerplato.exe
+      - command: mkdir -p dist && zip ./dist/boilerplato-v${version}-x86_64-pc-windows-gnu.zip ./target/x86_64-pc-windows-gnu/release/boilerplato.exe
   build:
     run:
-      - task: build:macos
-      - task: build:linux
-      - task: build:windows
+      - command: tusk build:macos --version ${version}
+      - command: tusk build:linux --version ${version}
+      - command: tusk build:windows --version ${version}
   upload-artifacts:
     run:
-      command: chmod +x scripts/upload-artifacts.sh && ./scripts/upload-artifacts.sh
+      command: chmod +x scripts/upload-artifacts.sh && ./scripts/upload-artifacts.sh ${version}
+  release:
+    run:
+      - command: git push orign master && git push origin develop && git push --tags
+      - command: tusk build --version ${version}
+      - command: tusk upload-artifacts --version ${version}
+      - command: echo "Publishing to crates.io, Type anything to confirm." && read confirmation && cargo publish

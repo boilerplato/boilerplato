@@ -2,28 +2,26 @@
 
 set -e
 
-if [ ! -f .env ]; then
-    export $(cat .env | xargs)
-fi
+export "$(xargs <.env)"
 
 github-release upload \
     --user boilerplato \
     --repo boilerplato \
-    --tag v1.0.0 \
-    --name "boilerplato-v1.0.0-x86_64-apple-darwin.tar.xz" \
-    --file dist/boilerplato-v1.0.0-x86_64-apple-darwin.tar.xz
+    --tag "$1" \
+    --name "boilerplato-v$1-x86_64-apple-darwin.tar.xz" \
+    --file "dist/boilerplato-v$1-x86_64-apple-darwin.tar.xz"
 
 github-release upload \
     --user boilerplato \
     --repo boilerplato \
-    --tag v1.0.0 \
-    --name "boilerplato-v1.0.0-x86_64-unknown-linux-gnu.tar.xz" \
-    --file dist/boilerplato-v1.0.0-x86_64-unknown-linux-gnu.tar.xz
+    --tag "$1" \
+    --name "boilerplato-v$1-x86_64-unknown-linux-gnu.tar.xz" \
+    --file "dist/boilerplato-v$1-x86_64-unknown-linux-gnu.tar.xz"
 
 github-release upload \
     --user boilerplato \
     --repo boilerplato \
-    --tag v1.0.0 \
-    --name "boilerplato-v1.0.0-x86_64-pc-windows-gnu.zip" \
-    --file dist/boilerplato-v1.0.0-x86_64-pc-windows-gnu.zip
+    --tag "$1" \
+    --name "boilerplato-v$1-x86_64-pc-windows-gnu.zip" \
+    --file "dist/boilerplato-v$1-x86_64-pc-windows-gnu.zip"
 
