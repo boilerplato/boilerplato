@@ -281,11 +281,11 @@ impl ProjectTemplate {
         if project_actual_file_path.exists() {
             project_actual_file_path
                 .to_str()
-                .and_then(|path| Some(PathBuf::from(format!("{}.old", path))))
-                .and_then(|path| {
-                    fs::rename(project_actual_file_path.as_path(), path.as_path())
+                .map(|path| PathBuf::from(format!("{}.old", path)))
+                .and_then(|new_path| {
+                    fs::rename(project_actual_file_path.as_path(), new_path.as_path())
                         .ok()
-                        .and_then(|_| Some(path))
+                        .map(|_| new_path)
                 })
                 .and_then(|new_path| {
                     println!(
