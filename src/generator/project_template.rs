@@ -2,12 +2,13 @@ use crate::constants;
 use crate::data_prompts;
 use crate::prelude::*;
 use crate::template_engine::TemplateEngine;
-use crate::types::{ConfigFileType, TemplateConfig};
+use crate::types::{ConfigFileType, TemplateConfig, TemplateData, TemplateDataType};
 use crate::utils;
 use colored::*;
+use serde_json::Value;
+use std::collections::HashMap;
 use std::env;
 use std::fs;
-use std::fs::DirEntry;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use url::Url;
@@ -139,19 +140,58 @@ impl ProjectTemplate {
         let template_dir = template_dir.as_ref();
         let project_dir = project_dir.as_ref();
 
-        let template_config = self.extract_template_config(template_dir)?;
+        let mut template_config = self.extract_template_config(template_dir)?;
 
-        let template_engine = TemplateEngine::parse(template_config.template_engine.as_str()).ok_or_else(|| {
+        if template_config.template.path.is_empty() {
+            template_config.template.path = constants::TEMPLATE_DEFAULT_TEMPLATE_PATH.to_owned();
+        }
+        if template_config.template.extension.is_empty() {
+            template_config.template.extension = constants::TEMPLATE_DEFAULT_FILE_EXTENSION.to_owned();
+        }
+
+        let template_source_dir = template_dir
+            .join(template_config.template.path.as_str())
+            .canonicalize()
+            .context("Template source not found")?;
+
+        if let Some(app_name) = project_dir.file_name().and_then(|name| name.to_str()) {
+            let found = template_config
+                .data
+                .iter_mut()
+                .find(|data| data.name == constants::TEMPLATE_DATA_APP_NAME);
+
+            if let Some(app_name_data) = found {
+                app_name_data.data_type = TemplateDataType::String;
+                app_name_data.values = None;
+                app_name_data.required = false;
+                app_name_data.default_value = Some(Value::String(app_name.to_owned()));
+            } else {
+                template_config.data.insert(
+                    0,
+                    TemplateData {
+                        name: constants::TEMPLATE_DATA_APP_NAME.to_owned(),
+                        data_type: TemplateDataType::String,
+                        values: None,
+                        required: false,
+                        default_value: Some(Value::String(app_name.to_owned())),
+                        message: format!("Enter app name: "),
+                    },
+                );
+            }
+        }
+
+        let template_meta = &template_config.template;
+        let template_engine = TemplateEngine::parse(template_meta.engine.as_str()).ok_or_else(|| {
             crate::Error::new(format!(
                 "Unsupported template engine specified in the provided template: {}",
-                template_config.template_engine
+                template_meta.engine.as_str()
             ))
         })?;
 
         let template_data =
             data_prompts::ask_data(&template_config).context("Failed to get template data from the user")?;
 
-        let ignore_file_path = template_dir.join(constants::TEMPLATE_BOILERPLATO_IGNORE_FILE_NAME);
+        let ignore_file_path = template_source_dir.join(constants::TEMPLATE_BOILERPLATO_IGNORE_FILE_NAME);
         let ignore_file_holder = {
             if ignore_file_path.exists() {
                 gitignore::File::new(ignore_file_path.as_path()).ok()
@@ -179,13 +219,92 @@ impl ProjectTemplate {
             return false;
         };
 
-        self.walk_template_dir(template_dir, &ignore_checker, &|entry_full_path| {
-            let entry_rel_path = entry_full_path.strip_prefix(template_dir).wrap()?;
+        println!(
+            "\nCreating a new app in {}\n",
+            project_dir.to_str().unwrap_or("").green()
+        );
 
-            println!("{:?}", entry_rel_path);
-
+        self.walk_template_dir(template_source_dir.as_path(), &ignore_checker, &|entry_full_path| {
+            self.gen_a_single_code_file(
+                template_source_dir.as_path(),
+                project_dir,
+                entry_full_path,
+                template_meta.extension.as_str(),
+                &template_engine,
+                &template_data,
+            )?;
             Ok(())
         })?;
+
+        println!(
+            "\nSuccess! Created {} at {}\n",
+            project_dir.file_name().and_then(|p| p.to_str()).unwrap_or("").green(),
+            project_dir.to_str().unwrap_or("").green()
+        );
+
+        Ok(())
+    }
+
+    fn gen_a_single_code_file(
+        &self,
+        template_source_dir: &Path,
+        project_dir: &Path,
+        template_file_full_path: &Path,
+        template_file_extension: &str,
+        template_engine: &TemplateEngine,
+        template_data: &HashMap<&str, Value>,
+    ) -> crate::Result<()> {
+        let template_file_rel_path = template_file_full_path.strip_prefix(template_source_dir).wrap()?;
+        let (is_template_file, template_file_rel_path_without_template_extension) = template_file_rel_path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .and_then(|ext| utils::or(ext == &template_file_extension[1..], Some(()), None))
+            .and_then(|_| template_file_rel_path.to_str())
+            .and_then(|rel_path| {
+                Some((
+                    true,
+                    Path::new(&rel_path[..(rel_path.len() - template_file_extension.len())]),
+                ))
+            })
+            .unwrap_or((false, template_file_rel_path));
+
+        let project_actual_file_path = project_dir.join(template_file_rel_path_without_template_extension);
+        if let Some(parent) = project_actual_file_path.parent() {
+            fs::create_dir_all(parent).context(format!(
+                "Couldn't create the missing project dir: {}",
+                parent.to_str().unwrap_or("")
+            ))?;
+        }
+
+        println!(
+            "{} {}",
+            "Generating".green(),
+            template_file_rel_path_without_template_extension.to_str().unwrap_or("")
+        );
+
+        if !is_template_file {
+            fs::copy(template_file_full_path, project_actual_file_path).context(format!(
+                "Failed to copy the template file: {}",
+                template_file_full_path.to_str().unwrap_or("")
+            ))?;
+        } else {
+            let template_text = fs::read_to_string(template_file_full_path).context(format!(
+                "Couldn't read the template file: {}",
+                template_file_full_path.to_str().unwrap_or("")
+            ))?;
+
+            let actual_code = template_engine
+                .render_template(template_text.as_str(), template_data)
+                .context(format!(
+                    "Failed to generate actual code from template file: {}",
+                    template_file_full_path.to_str().unwrap_or("")
+                ))?;
+
+            fs::write(project_actual_file_path.as_path(), actual_code.as_bytes()).context(format!(
+                "Can't write generated code to project file: {}",
+                project_actual_file_path.to_str().unwrap_or("")
+            ))?;
+        }
 
         Ok(())
     }
@@ -211,14 +330,16 @@ impl ProjectTemplate {
 
     fn walk_template_dir<T: AsRef<Path>, F: Fn(&Path) -> crate::Result<()>, I: Fn(&Path) -> bool>(
         &self,
-        template_dir: T,
+        template_source_dir: T,
         ignore_checker: &I,
         walker: &F,
     ) -> crate::Result<()> {
-        let template_dir = template_dir.as_ref();
-        let path_str = template_dir.to_str().unwrap_or("");
+        let template_source_dir = template_source_dir.as_ref();
+        let path_str = template_source_dir.to_str().unwrap_or("");
 
-        for entry in fs::read_dir(template_dir).context(format!("Failed to walk the template dir: {}", path_str))? {
+        for entry in
+            fs::read_dir(template_source_dir).context(format!("Failed to walk the template dir: {}", path_str))?
+        {
             let entry = entry.context(format!(
                 "Failed to fetch an entry details in template dir: {}",
                 path_str
@@ -250,7 +371,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_template_engine_parse() {
+    fn test_project_template_parse() {
         assert_eq!(
             ProjectTemplate::parse("react-redux-router-nodejs"),
             ProjectTemplate::InBuilt("react-redux-router-nodejs".to_owned())

@@ -7,11 +7,19 @@ use serde_json::{Number, Value};
 #[serde(rename_all = "camelCase")]
 pub struct TemplateConfig {
     pub version: String,
-    pub template_engine: String,
+    pub template: TemplateMeta,
     #[serde(default)]
     pub data: Vec<TemplateData>,
     pub post_generate: Option<Vec<String>>,
     pub help_text: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct TemplateMeta {
+    pub engine: String,
+    pub path: String,
+    pub extension: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -11,6 +11,12 @@ pub fn ask_data(config: &TemplateConfig) -> crate::Result<HashMap<&str, Value>> 
     let mut template_data = HashMap::with_capacity(config.data.len());
 
     for d in config.data.iter() {
+        // if d.name == constants::TEMPLATE_DATA_APP_NAME {
+        //     template_data.insert(
+        //         d.name.as_str(),
+        //         d.default_value.clone().unwrap_or_else(|| d.data_type.default_value()),
+        //     );
+        // }
         template_data.insert(d.name.as_str(), ask_a_single_data(d)?);
     }
 
@@ -53,7 +59,12 @@ pub fn ask_a_single_data(data_config: &TemplateData) -> crate::Result<Value> {
 }
 
 pub fn get_data_massage(data_config: &TemplateData) -> String {
-    let msg = data_config.message.trim();
+    let mut msg = data_config.message.trim();
+
+    let default_msg = format!("Enter {}: ", data_config.name);
+    if msg.is_empty() {
+        msg = default_msg.as_str();
+    }
 
     if data_config.required {
         return format!("{}", msg);

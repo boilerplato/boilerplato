@@ -20,6 +20,10 @@ pub const TEMPLATE_TYPE_BOOL_POSSIBLE_TRUTHY_INPUTS: [&'static str; 2] = ["yes",
 pub const TEMPLATE_TYPE_BOOL_POSSIBLE_FALSY_INPUTS: [&'static str; 2] = ["no", "n"];
 
 pub const TEMPLATE_TYPE_SEMVER_DEFAULT_VALUE: &'static str = "1.0.0";
+pub const TEMPLATE_DEFAULT_TEMPLATE_PATH: &'static str = ".";
+pub const TEMPLATE_DEFAULT_FILE_EXTENSION: &'static str = ".tpl";
+
+pub const TEMPLATE_DATA_APP_NAME: &'static str = "appName";
 
 lazy_static! {
     pub static ref RE_COMMA_SEPARATOR: Regex = Regex::new(r"[,\s]+").unwrap();
@@ -28,6 +32,7 @@ lazy_static! {
 lazy_static! {
     pub static ref TEMPLATE_IGNORED_FILES: Vec<&'static OsStr> = vec![
         ".git".as_ref(),
+        "node_modules".as_ref(),
         TEMPLATE_CONFIG_FILE_JSON.as_ref(),
         TEMPLATE_CONFIG_FILE_YAML.as_ref(),
         TEMPLATE_CONFIG_FILE_YML.as_ref(),
