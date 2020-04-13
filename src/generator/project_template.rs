@@ -260,12 +260,8 @@ impl ProjectTemplate {
             .and_then(|ext| ext.to_str())
             .and_then(|ext| utils::or(ext == &template_file_extension[1..], Some(()), None))
             .and_then(|_| template_file_rel_path.to_str())
-            .and_then(|rel_path| {
-                Some((
-                    true,
-                    Path::new(&rel_path[..(rel_path.len() - template_file_extension.len())]),
-                ))
-            })
+            .map(|rel_path| Path::new(&rel_path[..(rel_path.len() - template_file_extension.len())]))
+            .map(|rel_path| (true, rel_path))
             .unwrap_or((false, template_file_rel_path));
 
         println!(
