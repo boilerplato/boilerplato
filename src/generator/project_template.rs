@@ -361,9 +361,7 @@ impl ProjectTemplate {
         let template_source_dir = template_source_dir.as_ref();
         let path_str = template_source_dir.to_str().unwrap_or("");
 
-        for entry in
-            fs::read_dir(template_source_dir).context(format!("Failed to walk the template dir: {}", path_str))?
-        {
+        for entry in fs::read_dir(template_source_dir).context(format!("Failed to walk template dir: {}", path_str))? {
             let entry = entry.context(format!(
                 "Failed to fetch an entry details in template dir: {}",
                 path_str
