@@ -296,10 +296,15 @@ impl ProjectTemplate {
                         "{} You had a `{}` file, we renamed it to `{}`",
                         "Warning:".yellow(),
                         project_actual_file_path
-                            .file_name()
-                            .and_then(|name| name.to_str())
+                            .strip_prefix(project_dir)
+                            .ok()
+                            .and_then(|rel_path| rel_path.to_str())
                             .unwrap_or(""),
-                        new_path.file_name().and_then(|name| name.to_str()).unwrap_or("")
+                        new_path
+                            .strip_prefix(project_dir)
+                            .ok()
+                            .and_then(|rel_path| rel_path.to_str())
+                            .unwrap_or("")
                     );
                     Some(())
                 });
