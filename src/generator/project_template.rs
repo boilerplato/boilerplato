@@ -268,6 +268,12 @@ impl ProjectTemplate {
             })
             .unwrap_or((false, template_file_rel_path));
 
+        println!(
+            "{} {}",
+            "Generating".green(),
+            template_file_rel_path_without_template_extension.to_str().unwrap_or("")
+        );
+
         let project_actual_file_path = project_dir.join(template_file_rel_path_without_template_extension);
         if let Some(parent) = project_actual_file_path.parent() {
             fs::create_dir_all(parent).context(format!(
@@ -276,11 +282,28 @@ impl ProjectTemplate {
             ))?;
         }
 
-        println!(
-            "{} {}",
-            "Generating".green(),
-            template_file_rel_path_without_template_extension.to_str().unwrap_or("")
-        );
+        if project_actual_file_path.exists() {
+            project_actual_file_path
+                .to_str()
+                .and_then(|path| Some(PathBuf::from(format!("{}.old", path))))
+                .and_then(|path| {
+                    fs::rename(project_actual_file_path.as_path(), path.as_path())
+                        .ok()
+                        .and_then(|_| Some(path))
+                })
+                .and_then(|new_path| {
+                    println!(
+                        "{} You had a `{}` file, we renamed it to `{}`",
+                        "Warning:".yellow(),
+                        project_actual_file_path
+                            .file_name()
+                            .and_then(|name| name.to_str())
+                            .unwrap_or(""),
+                        new_path.file_name().and_then(|name| name.to_str()).unwrap_or("")
+                    );
+                    Some(())
+                });
+        }
 
         if !is_template_file {
             fs::copy(template_file_full_path, project_actual_file_path).context(format!(
