@@ -47,4 +47,11 @@ data:
     message: "Please enter initial app version: "
     required: false
     defaultValue: "1.0.0"
+postGenerate:
+  - "npm install"
+helpText: >-
+  This is a very long sentence
+  that spans several lines in the YAML
+  but which will be rendered as a string
+  with NO carriage returns.
 

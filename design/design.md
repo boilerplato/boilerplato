@@ -7,8 +7,6 @@ boilerplato my_app --template john/golang-server
 
 boilerplato my_app --template file:../my-custom-template
 
-boilerplato my_app --template git@bitbucket.org:rousan/react-redux-router
-
 boilerplato my_app --template https://github.com/rousan/rust-cli-boilerplate.git
 ``` 
 

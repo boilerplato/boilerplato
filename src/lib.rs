@@ -1,7 +1,13 @@
-use std::fs;
-use std::io;
-use std::path::Path;
+pub use self::error::{Error, ErrorExt, ResultExt};
 
-pub fn get_file_size<P: AsRef<Path>>(path: P) -> io::Result<u64> {
-    Ok(fs::metadata(path.as_ref())?.len())
-}
+pub mod constants;
+pub mod data_prompts;
+mod error;
+pub mod generator;
+pub mod help;
+pub mod prelude;
+pub mod template_engine;
+pub mod types;
+pub mod utils;
+
+pub type Result<T> = std::result::Result<T, Error>;
