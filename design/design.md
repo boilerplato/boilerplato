@@ -10,6 +10,18 @@ boilerplato my_app --template file:../my-custom-template
 boilerplato my_app --template https://github.com/rousan/rust-cli-boilerplate.git
 ``` 
 
+# Install
+
+```sh
+bash -c "$(curl -fsSL https://boilerplato.com/install)"
+```
+
+# Use Template without installing Boilerplato
+
+```sh
+bash -c "$(curl -fsSL https://boilerplato.com/gen)" -- <app_name> <template_name>
+```
+
 # Config file
 
 The config file should be: `boilerplato.yml` or `boilerplato.yaml` or `boilerplato.json`

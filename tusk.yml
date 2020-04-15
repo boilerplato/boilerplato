@@ -11,15 +11,21 @@ tasks:
   build:macos:
     run:
       - command: cargo build --release
-      - command: mkdir -p dist && tar cfJ ./dist/boilerplato-v${version}-x86_64-apple-darwin.tar.xz ./target/release/boilerplato
+      - command: mkdir -p dist
+      - command: cp ./target/release/boilerplato ./dist/boilerplato
+      - command: cd dist && tar cfJ boilerplato-v${version}-x86_64-apple-darwin.tar.xz boilerplato && rm boilerplato && cd ..
   build:linux:
     run:
       - command: cross build --release --target x86_64-unknown-linux-gnu
-      - command: mkdir -p dist && tar cfJ ./dist/boilerplato-v${version}-x86_64-unknown-linux-gnu.tar.xz ./target/x86_64-unknown-linux-gnu/release/boilerplato
+      - command: mkdir -p dist
+      - command: cp ./target/x86_64-unknown-linux-gnu/release/boilerplato ./dist/boilerplato
+      - command: cd dist && tar cfJ boilerplato-v${version}-x86_64-unknown-linux-gnu.tar.xz boilerplato && rm boilerplato && cd ..
   build:windows:
     run:
       - command: cross build --release --target x86_64-pc-windows-gnu
-      - command: mkdir -p dist && zip ./dist/boilerplato-v${version}-x86_64-pc-windows-gnu.zip ./target/x86_64-pc-windows-gnu/release/boilerplato.exe
+      - command: mkdir -p dist
+      - command: cp ./target/x86_64-pc-windows-gnu/release/boilerplato.exe ./dist/boilerplato.exe
+      - command: cd dist && zip boilerplato-v${version}-x86_64-pc-windows-gnu.zip boilerplato.exe && rm boilerplato.exe && cd ..
   build:
     run:
       - command: tusk build:macos --version ${version}
@@ -30,7 +36,7 @@ tasks:
       command: chmod +x scripts/upload-artifacts.sh && ./scripts/upload-artifacts.sh ${version}
   release:
     run:
-      - command: git push orign master && git push origin develop && git push --tags
+      - command: rm -rf dist
       - command: tusk build --version ${version}
       - command: tusk upload-artifacts --version ${version}
       - command: echo "Publishing to crates.io, Type anything to confirm." && read confirmation && cargo publish

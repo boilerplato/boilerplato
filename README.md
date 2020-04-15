@@ -1,15 +1,28 @@
 # boilerplato
 
-A CLI to generate app's source code from a template
+A CLI to generate app's source code from a template.
+
+**[WIP]**
 
 ## Install
 
-```sh
-bash -c "$(curl -fsSL https://boilerplato.com/install)"
-```
-
-### Use Template without installing Boilerplato
+### Macos
 
 ```sh
-bash -c "$(curl -fsSL https://boilerplato.com/gen)" -- <app_name> <template_name>
+ bash -c "$(curl -fsSL https://git.io/Jfv7y)" -- 1.0.0-alpha
 ```
+
+### Linux
+
+```sh
+ bash -c "$(curl -fsSL https://git.io/Jfv7y)" -- 1.0.0-alpha
+```
+
+### Windows
+
+Please download it from [release](https://github.com/boilerplato/boilerplato/releases) page.
+
+
+## Contributing
+
+Your PRs and stars are always welcome.
