@@ -1,6 +1,8 @@
 use crate::constants;
 use crate::data_prompts;
-use crate::generator::post_generator::{handle_post_generate_command, handle_post_generate_help_text};
+use crate::generator::post_generator::{
+    gen_extra_template_data, handle_post_generate_command, handle_post_generate_help_text, substitute_variable_in_text,
+};
 use crate::prelude::*;
 use crate::template_engine::TemplateEngine;
 use crate::types::{ConfigFileType, TemplateConfig, TemplateData, TemplateDataType};
@@ -144,44 +146,12 @@ impl ProjectTemplate {
         let project_dir = project_dir.as_ref();
 
         let mut template_config = self.extract_template_config(template_dir)?;
-
-        if template_config.template.path.is_empty() {
-            template_config.template.path = constants::TEMPLATE_DEFAULT_TEMPLATE_PATH.to_owned();
-        }
-        if template_config.template.extension.is_empty() {
-            template_config.template.extension = constants::TEMPLATE_DEFAULT_FILE_EXTENSION.to_owned();
-        }
+        self.resolve_template_config(&mut template_config, project_dir)?;
 
         let template_source_dir = template_dir
             .join(template_config.template.path.as_str())
             .canonicalize()
             .context("Template source not found")?;
-
-        if let Some(app_name) = project_dir.file_name().and_then(|name| name.to_str()) {
-            let found = template_config
-                .data
-                .iter_mut()
-                .find(|data| data.name == constants::TEMPLATE_DATA_APP_NAME);
-
-            if let Some(app_name_data) = found {
-                app_name_data.data_type = TemplateDataType::String;
-                app_name_data.values = None;
-                app_name_data.required = false;
-                app_name_data.default_value = Some(Value::String(app_name.to_owned()));
-            } else {
-                template_config.data.insert(
-                    0,
-                    TemplateData {
-                        name: constants::TEMPLATE_DATA_APP_NAME.to_owned(),
-                        data_type: TemplateDataType::String,
-                        values: None,
-                        required: false,
-                        default_value: Some(Value::String(app_name.to_owned())),
-                        message: format!("Enter app name: "),
-                    },
-                );
-            }
-        }
 
         let template_meta = &template_config.template;
         let template_engine = TemplateEngine::parse(template_meta.engine.as_str()).ok_or_else(|| {
@@ -241,6 +211,8 @@ impl ProjectTemplate {
             Ok(())
         })?;
 
+        self.initialize_git_to_project_dir(project_dir)?;
+
         println!();
 
         if let Some(ref val) = template_config.post_generate {
@@ -254,8 +226,62 @@ impl ProjectTemplate {
         );
 
         if let Some(ref val) = template_config.help_text {
-            handle_post_generate_help_text(val, project_dir, &template_data)?;
+            handle_post_generate_help_text(val, project_dir, &template_data, &template_engine)?;
         }
+
+        Ok(())
+    }
+
+    fn resolve_template_config(&self, template_config: &mut TemplateConfig, project_dir: &Path) -> crate::Result<()> {
+        if template_config.template.path.is_empty() {
+            template_config.template.path = constants::TEMPLATE_DEFAULT_TEMPLATE_PATH.to_owned();
+        }
+
+        if template_config.template.extension.is_empty() {
+            template_config.template.extension = constants::TEMPLATE_DEFAULT_FILE_EXTENSION.to_owned();
+        }
+
+        if let Some(app_name) = project_dir.file_name().and_then(|name| name.to_str()) {
+            let found = template_config
+                .data
+                .iter_mut()
+                .find(|data| data.name == constants::TEMPLATE_DATA_APP_NAME);
+
+            if let Some(app_name_data) = found {
+                app_name_data.data_type = TemplateDataType::String;
+                app_name_data.values = None;
+                app_name_data.required = false;
+                app_name_data.default_value = Some(Value::String(app_name.to_owned()));
+            } else {
+                template_config.data.insert(
+                    0,
+                    TemplateData {
+                        name: constants::TEMPLATE_DATA_APP_NAME.to_owned(),
+                        data_type: TemplateDataType::String,
+                        values: None,
+                        required: false,
+                        default_value: Some(Value::String(app_name.to_owned())),
+                        message: format!("Enter app name: "),
+                    },
+                );
+            }
+        }
+
+        let extra_data = gen_extra_template_data(project_dir);
+        template_config
+            .data
+            .iter_mut()
+            .filter(|d| d.data_type == TemplateDataType::String && !d.required)
+            .for_each(|d| {
+                d.default_value
+                    .as_ref()
+                    .and_then(|val| val.as_str())
+                    .map(|s| substitute_variable_in_text(s, &HashMap::new(), &extra_data))
+                    .and_then(|val| {
+                        d.default_value = Some(Value::String(val));
+                        Some(())
+                    });
+            });
 
         Ok(())
     }
@@ -343,6 +369,23 @@ impl ProjectTemplate {
                 "Can't write generated code to project file: {}",
                 project_actual_file_path.to_str().unwrap_or("")
             ))?;
+        }
+
+        Ok(())
+    }
+
+    fn initialize_git_to_project_dir(&self, project_dir: &Path) -> crate::Result<()> {
+        let output = Command::new("git")
+            .arg("init")
+            .current_dir(project_dir)
+            .output()
+            .context("The 'git' command not found")?;
+
+        if !output.status.success() {
+            return Err(crate::Error::new(format!(
+                "Failed to initialize git to the project dir: {}",
+                String::from_utf8(output.stderr).unwrap_or(String::new())
+            )));
         }
 
         Ok(())

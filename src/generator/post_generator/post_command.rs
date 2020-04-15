@@ -1,13 +1,10 @@
 use crate::constants;
 use crate::generator::post_generator::gen_extra_template_data;
 use crate::prelude::*;
-use crate::utils;
 use crate::utils::json_val_to_actual_str;
 use colored::*;
-use regex::{Captures, Regex};
 use serde_json::Value;
 use std::collections::HashMap;
-use std::env;
 use std::env::consts::OS;
 use std::path::Path;
 use std::process::{Command, Stdio};
@@ -65,7 +62,7 @@ fn execute_single_command(
         ("sh", ["-c", command])
     };
 
-    println!("$ {}", command.green());
+    println!("{} {}", "$".bold(), command.green());
     Command::new(program)
         .args(&args)
         .stdin(Stdio::inherit())

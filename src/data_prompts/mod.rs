@@ -11,12 +11,14 @@ pub fn ask_data(config: &TemplateConfig) -> crate::Result<HashMap<&str, Value>> 
     let mut template_data = HashMap::with_capacity(config.data.len());
 
     for d in config.data.iter() {
-        // if d.name == constants::TEMPLATE_DATA_APP_NAME {
-        //     template_data.insert(
-        //         d.name.as_str(),
-        //         d.default_value.clone().unwrap_or_else(|| d.data_type.default_value()),
-        //     );
-        // }
+        if d.name == constants::TEMPLATE_DATA_APP_NAME {
+            template_data.insert(
+                d.name.as_str(),
+                d.default_value.clone().unwrap_or_else(|| d.data_type.default_value()),
+            );
+            continue;
+        }
+
         template_data.insert(d.name.as_str(), ask_a_single_data(d)?);
     }
 

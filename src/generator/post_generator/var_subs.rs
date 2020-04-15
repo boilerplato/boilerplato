@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::env;
 
 lazy_static! {
-    static ref VARIABLE_RE: Regex = Regex::new(r"(?:\$([a-zA-Z\d_]+))|(:?\$\{([a-zA-Z\d_]+)\})").unwrap();
+    static ref VARIABLE_RE: Regex = Regex::new(r"(?:\$([a-zA-Z\d_]+))|(?:\$\{([a-zA-Z\d_]+)\})").unwrap();
 }
 
 pub fn substitute_variable_in_text(

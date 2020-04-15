@@ -1,6 +1,10 @@
 {
   "version": "1.0.0",
-  "templateEngine": "handlebars",
+  "template": {
+    "engine": "handlebars",
+    "path": "./templates",
+    "extension": ".tpl"
+  },
   "data": [
     {
       "name": "appName",

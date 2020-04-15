@@ -1,13 +1,14 @@
 version: 1.0.0
 template:
   engine: handlebars
-  path: "templates"
+  path: "./templates"
   extension: ".tpl"
 data:
-  - name: appName
-    type: string
-    message: "Enter your app name: "
-    required: true
+#  - name: appName [This data value will be set to $APP_NAME automatically, don't use it]
+#    type: string
+#    message: "Enter your app name: "
+#    required: false
+#    defaultValue: $APP_NAME
   - name: anyNumber
     type: number
     message: "Enter any number: "

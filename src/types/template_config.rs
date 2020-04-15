@@ -35,7 +35,7 @@ pub struct TemplateData {
     pub default_value: Option<Value>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Eq, PartialEq)]
 pub enum TemplateDataType {
     #[serde(rename = "string")]
     String,

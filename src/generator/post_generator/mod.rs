@@ -5,13 +5,23 @@ use std::path::Path;
 
 pub use self::help_text::handle_post_generate_help_text;
 pub use self::post_command::handle_post_generate_command;
+pub use self::var_subs::substitute_variable_in_text;
 
 mod help_text;
 mod post_command;
 mod var_subs;
 
-fn gen_extra_template_data(project_dir: &Path) -> HashMap<String, String> {
+pub fn gen_extra_template_data(project_dir: &Path) -> HashMap<String, String> {
     let mut map = HashMap::new();
+
+    map.insert(
+        constants::TEMPLATE_EXTRA_VAR_APP_NAME.to_owned(),
+        project_dir
+            .file_name()
+            .and_then(|f| f.to_str())
+            .map(|f| f.to_owned())
+            .unwrap_or(String::new()),
+    );
 
     map.insert(
         constants::TEMPLATE_EXTRA_VAR_PROJECT_DIR_FULL_PATH.to_owned(),

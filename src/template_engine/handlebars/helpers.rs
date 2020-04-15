@@ -1,3 +1,5 @@
+use crate::utils::json_val_to_actual_str;
+use colored::*;
 use handlebars::{Helper, HelperResult, JsonRender, Output, RenderError};
 use serde_json::Value;
 
@@ -57,6 +59,16 @@ pub fn ternary(h: &Helper, out: &mut dyn Output) -> HelperResult {
     } else {
         out.write(falsy_val.render().as_str())?;
     }
+
+    Ok(())
+}
+
+pub fn color(h: &Helper, out: &mut dyn Output) -> HelperResult {
+    let text = json_val_to_actual_str(param(h, 0)?);
+    let color = json_val_to_actual_str(param(h, 1)?);
+
+    let colored_text = text.as_str().color(Color::from(color.as_str()));
+    out.write(format!("{}", colored_text).as_str())?;
 
     Ok(())
 }

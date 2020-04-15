@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use crate::template_engine::handlebars::helpers::{concat, json_str, ternary};
+use crate::template_engine::handlebars::helpers::{color, concat, json_str, ternary};
 use handlebars::{Context, Handlebars, Helper, HelperResult, Output, RenderContext};
 use serde::Serialize;
 
@@ -18,6 +18,7 @@ impl<'a> HandlebarsTemplateEngine<'a> {
         helper!(h, "json_str", json_str);
         helper!(h, "concat", concat);
         helper!(h, "ternary", ternary);
+        helper!(h, "color", color);
 
         HandlebarsTemplateEngine { handle: h }
     }
@@ -26,6 +27,6 @@ impl<'a> HandlebarsTemplateEngine<'a> {
         let template_text = template_text.as_ref();
         self.handle
             .render_template(template_text, data)
-            .context("Failed to parse the template file as handlebars")
+            .context("Failed to parse the template text as handlebars")
     }
 }
