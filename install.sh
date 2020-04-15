@@ -4,8 +4,8 @@ set -e
 
 echo "$1"
 
-LINUX_ARTIFACT="https://github.com/rousan/boilerplato/releases/download/v$1/boilerplato-v$1-x86_64-unknown-linux-gnu.tar.xz"
-MACOS_ARTIFACT="https://github.com/rousan/boilerplato/releases/download/v$1/boilerplato-v$1-x86_64-apple-darwin.tar.xz"
+LINUX_ARTIFACT="https://github.com/boilerplato/boilerplato/releases/download/v$1/boilerplato-v$1-x86_64-unknown-linux-gnu.tar.xz"
+MACOS_ARTIFACT="https://github.com/boilerplato/boilerplato/releases/download/v$1/boilerplato-v$1-x86_64-apple-darwin.tar.xz"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   curl -fsSL "$LINUX_ARTIFACT" --output /tmp/boilerplato.output.tar.xz
