@@ -1,0 +1,102 @@
+version: 1.0.0
+template:
+  engine: handlebars
+  path: "./templates"
+  extension: ".tpl"
+data:
+#  - name: appName [This data value will be set to $APP_NAME automatically, don't use it]
+#    type: string
+#    message: "Enter your app name: "
+#    required: false
+#    defaultValue: $APP_NAME
+  - name: anyNumber
+    type: number
+    message: "Enter any number: "
+    required: false
+    defaultValue: 0
+  - name: isPrivate
+    type: bool
+    message: "Is it a private project?"
+    required: false
+    defaultValue: false
+  - name: listValue
+    type: array[number]
+    message: "Enter multiple numbers: "
+    required: true
+  - name: listValue2
+    type: array[string]
+    message: "Enter multiple strings: "
+    required: true
+  - name: license
+    type: string
+    values:
+      - MIT
+      - APACHE
+    message: "Choose license [MIT, APACHE]: "
+    required: false
+    defaultValue: MIT
+  - name: chooseNumberOneToFive
+    type: number
+    values:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+    message: "Choose a number from 1 to 5: "
+    required: false
+    defaultValue: 1
+  - name: appVersion
+    type: semver
+    message: "Please enter initial app version: "
+    required: false
+    defaultValue: "1.0.0"
+postGenerate: "single command ${appVersion}"
+postGenerate2:
+  - 'echo "I can use template data here: $appName"'
+  - "command2"
+postGenerate3:
+  all: "single command"
+  macos: "single command"
+  windows: "single command"
+  linux: "single command"
+postGenerate4:
+  all:
+    - "command1"
+    - "command2"
+  macos:
+    - "command1"
+    - "command2"
+  windows:
+    - "command1"
+    - "command2"
+  linux:
+    - "command1"
+    - "command2"
+helpText: >-
+  This is a very long sentence
+  that spans several lines in the YAML
+  but which will be rendered as a string
+  with NO carriage returns.
+helpText1:
+  - "text1"
+  - "text2"
+helpText2:
+  all: "single text"
+  macos: "single text"
+  windows: "single text"
+  linux: "single text"
+helpText3:
+  all:
+    - "text1"
+    - "text2"
+  macos:
+    - "text1"
+    - "text2"
+  windows:
+    - "text1"
+    - "text2"
+  linux:
+    - "text1"
+    - "text2"
+
