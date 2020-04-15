@@ -30,7 +30,7 @@ tasks:
       command: chmod +x scripts/upload-artifacts.sh && ./scripts/upload-artifacts.sh ${version}
   release:
     run:
-      - command: git push orign master && git push origin develop && git push --tags
+      - command: git push origin master && git push origin develop && git push --tags
       - command: tusk build --version ${version}
       - command: tusk upload-artifacts --version ${version}
       - command: echo "Publishing to crates.io, Type anything to confirm." && read confirmation && cargo publish
