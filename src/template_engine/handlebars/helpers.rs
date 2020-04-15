@@ -48,8 +48,9 @@ pub fn ternary(h: &Helper, out: &mut dyn Output) -> HelperResult {
         .or_else(|| cond.as_str().map(|s| !s.is_empty()))
         .or_else(|| cond.as_f64().map(|n| n != 0_f64))
         .or_else(|| cond.as_array().map(|a| !a.is_empty()))
-        .or_else(|| cond.as_null().map(|val| false))
-        .unwrap_or(false);
+        .or_else(|| cond.as_object().map(|_| true))
+        .or_else(|| cond.as_null().map(|_| false))
+        .ok_or_else(|| RenderError::new("Invalid condition is provided"))?;
 
     if cond {
         out.write(truthy_val.render().as_str())?;
