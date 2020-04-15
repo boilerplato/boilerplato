@@ -3,6 +3,7 @@ use crate::prelude::*;
 use std::fs;
 use std::path::Path;
 
+mod post_generator;
 mod project_template;
 
 pub fn gen_source_code_from_template<P: AsRef<Path>, T: AsRef<str>>(project_dir: P, template: T) -> crate::Result<()> {

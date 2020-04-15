@@ -33,3 +33,12 @@ Currently, only `handlebars` is supported.
 # Template Engine: Handlebars
 
 These are the built-in handlebars helper functions will be provided while parsing:
+- json_str
+- concat
+- ternary
+
+# Available environment variables and substitute variables for post generate commands and help text in boilerplato.yml file:
+- All the template data with their exact name
+- Running system's envs
+- APP_FULL_PATH
+- APP_REL_PATH [app folder's relative path based on app generation directory]

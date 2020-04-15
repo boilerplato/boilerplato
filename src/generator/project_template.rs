@@ -1,5 +1,6 @@
 use crate::constants;
 use crate::data_prompts;
+use crate::generator::post_generator::{handle_post_generate_command, handle_post_generate_help_text};
 use crate::prelude::*;
 use crate::template_engine::TemplateEngine;
 use crate::types::{ConfigFileType, TemplateConfig, TemplateData, TemplateDataType};
@@ -240,11 +241,21 @@ impl ProjectTemplate {
             Ok(())
         })?;
 
+        println!();
+
+        if let Some(ref val) = template_config.post_generate {
+            handle_post_generate_command(val, project_dir, &template_data)?;
+        }
+
         println!(
             "\nSuccess! Created {} at {}\n",
             project_dir.file_name().and_then(|p| p.to_str()).unwrap_or("").green(),
             project_dir.to_str().unwrap_or("").green()
         );
+
+        if let Some(ref val) = template_config.help_text {
+            handle_post_generate_help_text(val, project_dir, &template_data)?;
+        }
 
         Ok(())
     }

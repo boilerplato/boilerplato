@@ -10,8 +10,8 @@ pub struct TemplateConfig {
     pub template: TemplateMeta,
     #[serde(default)]
     pub data: Vec<TemplateData>,
-    pub post_generate: Option<Vec<String>>,
-    pub help_text: Option<String>,
+    pub post_generate: Option<Value>,
+    pub help_text: Option<Value>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
