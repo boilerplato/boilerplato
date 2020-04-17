@@ -39,4 +39,4 @@ tasks:
       - command: rm -rf dist
       - command: tusk build --version ${version}
       - command: tusk upload-artifacts --version ${version}
-      - command: echo "Publishing to crates.io, Type anything to confirm." && read confirmation && cargo publish
+      - command: echo "Publishing to crates.io, hit Enter to confirm." && read confirmation && cargo publish
