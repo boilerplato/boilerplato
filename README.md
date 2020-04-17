@@ -23,19 +23,27 @@ Visit [https://boilerplato.com](https://boilerplato.com/) for more info.
 ### Macos
 
 ```sh
- bash -c "$(curl -fsSL https://git.io/Jfv7y)"
+ $ bash -c "$(curl -fsSL https://git.io/Jfv7y)"
 ```
 
 ### Linux
 
 ```sh
- bash -c "$(curl -fsSL https://git.io/Jfv7y)"
+ $ bash -c "$(curl -fsSL https://git.io/Jfv7y)"
 ```
 
 ### Windows
 
 Please download it from [release](https://github.com/boilerplato/boilerplato/releases) page.
 
+
+## Usage
+
+```sh
+$ boilerplato <app_name> --template <tempate_name>
+```
+
+Available templates are hosted on: [https://github.com/boilerplato](https://github.com/boilerplato).
 
 ## Contributing
 
