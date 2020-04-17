@@ -14,7 +14,7 @@
 
 A powerful tool to generate boilerplate source code from a template.
 
-> Don't waste time on creating boilerpalate source code, focus on actual app logic.
+> Let Boilerplato to create boilerplate source code and you focus on actual app logic.
 
 Visit [https://boilerplato.com](https://boilerplato.com/) for more info.
 
