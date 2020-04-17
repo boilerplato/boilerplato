@@ -40,7 +40,7 @@ Please download it from [release](https://github.com/boilerplato/boilerplato/rel
 ## Usage
 
 ```sh
-$ boilerplato <app_name> --template <tempate_name>
+$ boilerplato <app_name> --template <template_name>
 ```
 
 Available templates are hosted on: [https://github.com/boilerplato](https://github.com/boilerplato).
