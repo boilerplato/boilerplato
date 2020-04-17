@@ -37,7 +37,9 @@ tasks:
   release:
     run:
       - command: git push origin master && git push origin develop && git push --tags
+      - command: echo "\nTags are pushed to Github, Edit it and make it a release. Hit Enter to conform:\n" && read confirmation
       - command: rm -rf dist
       - command: tusk build --version ${version}
       - command: tusk upload-artifacts --version ${version}
-      - command: echo "Publishing to crates.io, hit Enter to confirm." && read confirmation && cargo publish
+      - command: echo "\nPublishing to crates.io, hit Enter to confirm:\n" && read confirmation
+      - command: cargo publish
