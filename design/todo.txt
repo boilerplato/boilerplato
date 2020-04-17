@@ -1,0 +1,14 @@
+1. Can't escape curly braces:
+ "dependencies": \{{{#if isAntdIncluded}}
+    "antd": "^3.26.15",
+    {{/if}}
+
+
+ 2. Only for Local Template: The /node_modules folder is ignored in .gitignore file, but still we needed to ignore this folder in .boilerplatoignore file otherwise the app is very slow.
+ Steps to replicate:
+    1. ignore node_modules in .gitignore file and create an empty .boilerplatoignore file
+    2. Now generate the app
+    3. The app will be slow
+ Workaround
+    1. Add "/node_modules" in .boilerplatoignore file as well
+
