@@ -146,7 +146,7 @@ impl ProjectTemplate {
         let project_dir = project_dir.as_ref();
 
         let mut template_config = self.extract_template_config(template_dir)?;
-        self.resolve_template_config(&mut template_config, project_dir)?;
+        self.resolve_template_config(&mut template_config, template_dir, project_dir)?;
 
         let template_source_dir = template_dir
             .join(template_config.template.path.as_str())
@@ -232,7 +232,13 @@ impl ProjectTemplate {
         println!();
 
         if let Some(ref val) = template_config.post_generate {
-            handle_post_generate_command(val, project_dir, &template_data)?;
+            handle_post_generate_command(
+                val,
+                template_dir,
+                template_source_dir.as_path(),
+                project_dir,
+                &template_data,
+            )?;
         }
 
         println!(
@@ -242,13 +248,25 @@ impl ProjectTemplate {
         );
 
         if let Some(ref val) = template_config.help_text {
-            handle_post_generate_help_text(val, project_dir, &template_data, &template_engine)?;
+            handle_post_generate_help_text(
+                val,
+                template_dir,
+                template_source_dir.as_path(),
+                project_dir,
+                &template_data,
+                &template_engine,
+            )?;
         }
 
         Ok(())
     }
 
-    fn resolve_template_config(&self, template_config: &mut TemplateConfig, project_dir: &Path) -> crate::Result<()> {
+    fn resolve_template_config(
+        &self,
+        template_config: &mut TemplateConfig,
+        template_dir: &Path,
+        project_dir: &Path,
+    ) -> crate::Result<()> {
         if template_config.template.path.is_empty() {
             template_config.template.path = constants::TEMPLATE_DEFAULT_TEMPLATE_PATH.to_owned();
         }
@@ -283,7 +301,15 @@ impl ProjectTemplate {
             }
         }
 
-        let extra_data = gen_extra_template_data(project_dir);
+        let extra_data = gen_extra_template_data(
+            template_dir,
+            template_dir
+                .join(template_config.template.path.as_str())
+                .canonicalize()
+                .context("Template source not found")?
+                .as_path(),
+            project_dir,
+        );
         template_config
             .data
             .iter_mut()

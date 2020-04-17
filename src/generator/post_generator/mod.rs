@@ -11,7 +11,11 @@ mod help_text;
 mod post_command;
 mod var_subs;
 
-pub fn gen_extra_template_data(project_dir: &Path) -> HashMap<String, String> {
+pub fn gen_extra_template_data(
+    template_dir: &Path,
+    template_source_dir: &Path,
+    project_dir: &Path,
+) -> HashMap<String, String> {
     let mut map = HashMap::new();
 
     map.insert(
@@ -34,6 +38,19 @@ pub fn gen_extra_template_data(project_dir: &Path) -> HashMap<String, String> {
             .ok()
             .and_then(|cwd| pathdiff::diff_paths(project_dir, cwd.as_path()))
             .and_then(|p| p.to_str().map(|p| p.to_owned()))
+            .unwrap_or(String::new()),
+    );
+
+    map.insert(
+        constants::TEMPLATE_EXTRA_VAR_TEMPLATE_PATH.to_owned(),
+        template_dir.to_str().map(|p| p.to_owned()).unwrap_or(String::new()),
+    );
+
+    map.insert(
+        constants::TEMPLATE_EXTRA_VAR_TEMPLATE_SOURCE_PATH.to_owned(),
+        template_source_dir
+            .to_str()
+            .map(|p| p.to_owned())
             .unwrap_or(String::new()),
     );
 

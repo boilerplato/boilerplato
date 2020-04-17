@@ -73,8 +73,19 @@ pub fn color(h: &Helper, out: &mut dyn Output) -> HelperResult {
     Ok(())
 }
 
+pub fn replace(h: &Helper, out: &mut dyn Output) -> HelperResult {
+    let text = json_val_to_actual_str(param(h, 0)?);
+    let from = json_val_to_actual_str(param(h, 1)?);
+    let to = json_val_to_actual_str(param(h, 2)?);
+
+    let transformed_text = text.replace(from.as_str(), to.as_str());
+    out.write(transformed_text.as_str())?;
+
+    Ok(())
+}
+
 fn param<'a>(h: &'a Helper, idx: usize) -> Result<&'a Value, RenderError> {
     h.param(idx)
         .map(|v| v.value())
-        .ok_or_else(|| RenderError::new(format!("The {} param not provided", idx)))
+        .ok_or_else(|| RenderError::new(format!("The {} no. param not provided", idx)))
 }

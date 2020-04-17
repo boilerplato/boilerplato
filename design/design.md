@@ -45,10 +45,12 @@ Currently, only `handlebars` is supported.
 # Template Engine: Handlebars
 
 These are the built-in handlebars helper functions will be provided while parsing:
+- built-in: https://docs.rs/handlebars/3.0.1/handlebars/#built-in-helpers
 - json_str
 - concat
 - ternary
 - color
+- replace
 
 # The following In-Built `template variables data` will be available at all handlebars syntax including helpText:
 - appName [the app folder name] e.g. `{{ appName }}`
@@ -59,6 +61,8 @@ These are the built-in handlebars helper functions will be provided while parsin
 - APP_FULL_PATH
 - APP_REL_PATH [app folder's relative path based on app generation directory]
 - APP_NAME [app folder name]
+- TEMPLATE_PATH [Template folder root path]
+- TEMPLATE_SOURCE_PATH [Actual template files source path]
 
 > The helpText in boilerplato.yml file supports handlebars and the template data can be used there and the helper functions as well.
 > So, the helpText becomes so powerful as:
@@ -72,6 +76,8 @@ These are the built-in handlebars helper functions will be provided while parsin
 >   - APP_FULL_PATH
 >   - APP_REL_PATH [app folder's relative path based on app generation directory]
 >   - APP_NAME [app folder name]
+>   - TEMPLATE_PATH [Template folder root path]
+>   - TEMPLATE_SOURCE_PATH [Actual template files source path]
 Use it as follows:
 ```yaml
 data:
