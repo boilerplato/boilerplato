@@ -1,6 +1,6 @@
 # boilerplato
 
-A CLI to generate app's source code from a template.
+A powerful tool to generate boilerplate source code from a template.
 
 **[WIP]**
 

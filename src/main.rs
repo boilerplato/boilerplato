@@ -7,7 +7,7 @@ fn main() {
         .version(env!("CARGO_PKG_VERSION"))
         .version_short("v")
         .author("Rousan Ali <hello@rousan.io> (https://rousan.io)")
-        .about("A CLI to generate app's source code from a template")
+        .about("A powerful tool to generate boilerplate source code from a template.\nPlease visit https://boilerplato.com for more information.")
         .arg(
             Arg::with_name("projectDirectory")
                 .help("The project directory to create source files into")
