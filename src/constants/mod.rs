@@ -15,6 +15,7 @@ pub const TEMPLATE_CONFIG_FILE_JSON: &'static str = "boilerplato.json";
 pub const TEMPLATE_CONFIG_FILE_YAML: &'static str = "boilerplato.yaml";
 pub const TEMPLATE_CONFIG_FILE_YML: &'static str = "boilerplato.yml";
 pub const TEMPLATE_BOILERPLATO_IGNORE_FILE_NAME: &'static str = ".boilerplatoignore";
+pub const TEMPLATE_GIT_IGNORE_FILE_NAME: &'static str = ".gitignore";
 
 pub const TEMPLATE_TYPE_BOOL_POSSIBLE_TRUTHY_INPUTS: [&'static str; 2] = ["yes", "y"];
 pub const TEMPLATE_TYPE_BOOL_POSSIBLE_FALSY_INPUTS: [&'static str; 2] = ["no", "n"];
