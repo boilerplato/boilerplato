@@ -11,7 +11,7 @@ The {} can be one of:
     - any git repo having boilerplato.yml or boilerplato.json file: e.g. {}\n\n\
         ",
         "--template".cyan(),
-        "rust-cli-template".green(),
+        "react-nodejs-template".green(),
         "john/web-app-template".green(),
         "file:../my-custom-template".green(),
         "https://github.com/foo/bar.git".green()
