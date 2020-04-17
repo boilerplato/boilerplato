@@ -38,10 +38,10 @@ tasks:
     args:
       message:
         usage: The confirmation message
-      run: echo "\n${message}\n" && read confirmation
+    run: echo "\n${message}\n" && read confirmation
   release:
     run:
-      - comamnd: git checkout develop && git push
+      - command: git checkout develop && git push
       - command: git flow release start "v${version}"
       - command: tusk confirm "Please bump version with ${version} in Cargo.toml file. Hit Enter once done:"
       - command: git add --all && git commit -m "Bump version"
@@ -53,4 +53,4 @@ tasks:
       - command: tusk build --version ${version}
       - command: tusk upload-artifacts --version ${version}
       - command: tusk confirm "Publishing to crates.io, hit Enter to confirm:"
-      - command: cargo publish
+      git - command: cargo publish
