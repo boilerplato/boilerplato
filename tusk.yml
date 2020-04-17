@@ -53,4 +53,4 @@ tasks:
       - command: tusk build --version ${version}
       - command: tusk upload-artifacts --version ${version}
       - command: tusk confirm "Publishing to crates.io, hit Enter to confirm:"
-      git - command: cargo publish
+      - command: cargo publish
