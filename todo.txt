@@ -1,0 +1,4 @@
+Can't escape curly braces:
+ dependencies": \{{{#if isAntdIncluded}}
+    "antd": "^3.26.15",
+    {{/if}}

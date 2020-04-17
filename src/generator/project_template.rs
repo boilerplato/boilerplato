@@ -164,24 +164,40 @@ impl ProjectTemplate {
         let template_data =
             data_prompts::ask_data(&template_config).context("Failed to get template data from the user")?;
 
-        let ignore_file_path = template_source_dir.join(constants::TEMPLATE_BOILERPLATO_IGNORE_FILE_NAME);
-        let ignore_file_holder = {
-            if ignore_file_path.exists() {
-                gitignore::File::new(ignore_file_path.as_path()).ok()
+        let boilerplato_ignore_file_path = template_source_dir.join(constants::TEMPLATE_BOILERPLATO_IGNORE_FILE_NAME);
+        let boilerplato_ignore_file_holder = {
+            if boilerplato_ignore_file_path.exists() {
+                gitignore::File::new(boilerplato_ignore_file_path.as_path()).ok()
+            } else {
+                None
+            }
+        };
+
+        let git_ignore_file_path = template_source_dir.join(constants::TEMPLATE_GIT_IGNORE_FILE_NAME);
+        let git_ignore_file_holder = {
+            if let (ProjectTemplate::Local(_), true) = (self, git_ignore_file_path.exists()) {
+                gitignore::File::new(git_ignore_file_path.as_path()).ok()
             } else {
                 None
             }
         };
 
         let ignore_checker = |entry_path: &Path| {
-            let file_name = entry_path.file_name();
-            if let Some(file_name) = file_name {
+            if let Some(file_name) = entry_path.file_name() {
                 if constants::TEMPLATE_IGNORED_FILES.contains(&file_name) {
                     return true;
                 }
             }
 
-            if let Some(ref f) = ignore_file_holder {
+            if let Some(ref f) = boilerplato_ignore_file_holder {
+                if let Some(ignored) = f.is_excluded(entry_path).ok() {
+                    if ignored {
+                        return true;
+                    }
+                }
+            }
+
+            if let Some(ref f) = git_ignore_file_holder {
                 if let Some(ignored) = f.is_excluded(entry_path).ok() {
                     if ignored {
                         return true;
