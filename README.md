@@ -2,6 +2,10 @@
   <a href="https://github.com/boilerplato">
     <img width="200" height="200" src="https://avatars3.githubusercontent.com/u/63495711?s=200&v=4">
   </a>
+  <h3 align="center">
+    Boilerplato
+  </h3>
+  <br />
 </div>
 
 [![Crate](https://img.shields.io/crates/v/boilerplato.svg)](https://crates.io/crates/boilerplato)
@@ -14,7 +18,7 @@ A powerful tool to generate boilerplate source code from a template.
 
 > Don't waste time on creating boilerpalate source code, focus on actual app logic.
 
-**[WIP]**
+Visit [https://boilerplato.com](https://boilerplato.com/) for more info.
 
 ## Install
 
