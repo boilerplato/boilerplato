@@ -13,13 +13,13 @@ tasks:
       - command: cargo build --release
       - command: mkdir -p dist
       - command: cp ./target/release/boilerplato ./dist/boilerplato
-      - command: cd dist && tar cfJ boilerplato-v${version}-x86_64-apple-darwin.tar.xz boilerplato && rm boilerplato && cd ..
+      - command: cd dist && tar -czvf boilerplato-v${version}-x86_64-apple-darwin.tar.gz boilerplato && rm boilerplato && cd ..
   build:linux:
     run:
       - command: cross build --release --target x86_64-unknown-linux-gnu
       - command: mkdir -p dist
       - command: cp ./target/x86_64-unknown-linux-gnu/release/boilerplato ./dist/boilerplato
-      - command: cd dist && tar cfJ boilerplato-v${version}-x86_64-unknown-linux-gnu.tar.xz boilerplato && rm boilerplato && cd ..
+      - command: cd dist && tar -czvf boilerplato-v${version}-x86_64-unknown-linux-gnu.tar.gz boilerplato && rm boilerplato && cd ..
   build:windows:
     run:
       - command: cross build --release --target x86_64-pc-windows-gnu
@@ -37,7 +37,9 @@ tasks:
   release:
     run:
       - command: git push origin master && git push origin develop && git push --tags
+      - command: echo "\nTags are pushed to Github, Edit it and make it a release. Hit Enter to conform:\n" && read confirmation
       - command: rm -rf dist
       - command: tusk build --version ${version}
       - command: tusk upload-artifacts --version ${version}
-      - command: echo "Publishing to crates.io, hit Enter to confirm." && read confirmation && cargo publish
+      - command: echo "\nPublishing to crates.io, hit Enter to confirm:\n" && read confirmation
+      - command: cargo publish

@@ -1,6 +1,6 @@
 [package]
 name = "boilerplato"
-version = "1.0.0-alpha.3"
+version = "1.0.0-alpha.4"
 description = "Generate app's boilerplate source code and focus on app logic."
 homepage = "https://boilerplato.com"
 repository = "https://github.com/boilerplato/boilerplato"
