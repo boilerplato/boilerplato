@@ -2,6 +2,7 @@ use crate::utils::json_val_to_actual_str;
 use colored::*;
 use handlebars::{Helper, HelperResult, JsonRender, Output, RenderError};
 use serde_json::Value;
+use std::env::consts::OS;
 
 #[macro_export]
 macro_rules! helper {
@@ -81,6 +82,11 @@ pub fn replace(h: &Helper, out: &mut dyn Output) -> HelperResult {
     let transformed_text = text.replace(from.as_str(), to.as_str());
     out.write(transformed_text.as_str())?;
 
+    Ok(())
+}
+
+pub fn os(_: &Helper, out: &mut dyn Output) -> HelperResult {
+    out.write(OS)?;
     Ok(())
 }
 

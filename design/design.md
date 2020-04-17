@@ -51,6 +51,7 @@ These are the built-in handlebars helper functions will be provided while parsin
 - ternary
 - color
 - replace
+- os
 
 # The following In-Built `template variables data` will be available at all handlebars syntax including helpText:
 - appName [the app folder name] e.g. `{{ appName }}`
