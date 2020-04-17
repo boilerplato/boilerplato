@@ -9,13 +9,13 @@ A CLI to generate app's source code from a template.
 ### Macos
 
 ```sh
- bash -c "$(curl -fsSL https://git.io/Jfv7y)" -- 1.0.0-alpha.3
+ bash -c "$(curl -fsSL https://git.io/Jfv7y)" -- 1.0.0-alpha.4
 ```
 
 ### Linux
 
 ```sh
- bash -c "$(curl -fsSL https://git.io/Jfv7y)" -- 1.0.0-alpha.3
+ bash -c "$(curl -fsSL https://git.io/Jfv7y)" -- 1.0.0-alpha.4
 ```
 
 ### Windows
