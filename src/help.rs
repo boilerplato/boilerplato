@@ -11,7 +11,7 @@ The {} can be one of:
     - any git repo having boilerplato.yml or boilerplato.json file: e.g. {}\n\n\
         ",
         "--template".cyan(),
-        "rust-cli-template".green(),
+        "react-nodejs-template".green(),
         "john/web-app-template".green(),
         "file:../my-custom-template".green(),
         "https://github.com/foo/bar.git".green()
@@ -25,8 +25,8 @@ Examples:
     - create a react app: {}
     - create a Rust CLI app: {}\n\n\
         ",
-        "$ boilerplato my-app --template react-redux-router-nodejs".green(),
-        "$ boilerplato my-rust-cli-app --template rust-cli-app".green()
+        "$ boilerplato my-app --template react-nodejs-template".green(),
+        "$ boilerplato my-app --template rust-cli-template".green()
     );
 }
 
