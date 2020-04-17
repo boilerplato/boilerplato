@@ -73,6 +73,13 @@ postGenerate4:
   linux:
     - "command1"
     - "command2"
+    - |
+      set -e
+      errcho() {
+        >&2 echo "$@"
+      }
+      errcho "Hello, world!"
+      errcho "Goodbye, world!"
 helpText: >-
   This is a very long sentence
   that spans several lines in the YAML

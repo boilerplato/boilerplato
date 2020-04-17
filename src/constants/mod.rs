@@ -31,6 +31,8 @@ pub const TEMPLATE_OS_FLAG_ALL: &'static str = "all";
 pub const TEMPLATE_EXTRA_VAR_APP_NAME: &'static str = "APP_NAME";
 pub const TEMPLATE_EXTRA_VAR_PROJECT_DIR_FULL_PATH: &'static str = "APP_FULL_PATH";
 pub const TEMPLATE_EXTRA_VAR_PROJECT_DIR_REL_PATH: &'static str = "APP_REL_PATH";
+pub const TEMPLATE_EXTRA_VAR_TEMPLATE_PATH: &'static str = "TEMPLATE_PATH";
+pub const TEMPLATE_EXTRA_VAR_TEMPLATE_SOURCE_PATH: &'static str = "TEMPLATE_SOURCE_PATH";
 
 lazy_static! {
     pub static ref RE_COMMA_SEPARATOR: Regex = Regex::new(r"[,\s]+").unwrap();

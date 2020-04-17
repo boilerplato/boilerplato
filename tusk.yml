@@ -34,12 +34,23 @@ tasks:
   upload-artifacts:
     run:
       command: chmod +x scripts/upload-artifacts.sh && ./scripts/upload-artifacts.sh ${version}
+  confirm:
+    args:
+      message:
+        usage: The confirmation message
+    run: echo "\n${message}\n" && read confirmation
   release:
     run:
+      - command: git checkout develop && git push
+      - command: git flow release start "v${version}"
+      - command: tusk confirm "Please bump version with ${version} in Cargo.toml file. Hit Enter once done:"
+      - command: git add --all && git commit -m "Bump version"
+      - command: git flow release finish -s "v${version}"
+      - command: git checkout master
       - command: git push origin master && git push origin develop && git push --tags
-      - command: echo "\nTags are pushed to Github, Edit it and make it a release. Hit Enter to conform:\n" && read confirmation
+      - command: tusk confirm "Tags are pushed to Github. Edit it there and make it a release. Hit Enter once done:"
       - command: rm -rf dist
       - command: tusk build --version ${version}
       - command: tusk upload-artifacts --version ${version}
-      - command: echo "\nPublishing to crates.io, hit Enter to confirm:\n" && read confirmation
+      - command: tusk confirm "Publishing to crates.io, hit Enter to confirm:"
       - command: cargo publish

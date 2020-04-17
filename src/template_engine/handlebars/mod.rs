@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use crate::template_engine::handlebars::helpers::{color, concat, json_str, ternary};
+use crate::template_engine::handlebars::helpers::{color, concat, json_str, os, replace, ternary};
 use handlebars::{Context, Handlebars, Helper, HelperResult, Output, RenderContext};
 use serde::Serialize;
 
@@ -19,6 +19,8 @@ impl<'a> HandlebarsTemplateEngine<'a> {
         helper!(h, "concat", concat);
         helper!(h, "ternary", ternary);
         helper!(h, "color", color);
+        helper!(h, "replace", replace);
+        helper!(h, "os", os);
 
         HandlebarsTemplateEngine { handle: h }
     }
