@@ -25,8 +25,8 @@ Examples:
     - create a react app: {}
     - create a Rust CLI app: {}\n\n\
         ",
-        "$ boilerplato my-app --template react-redux-router-nodejs".green(),
-        "$ boilerplato my-rust-cli-app --template rust-cli-app".green()
+        "$ boilerplato my-app --template react-nodejs-template".green(),
+        "$ boilerplato my-app --template rust-cli-template".green()
     );
 }
 
