@@ -21,10 +21,11 @@ pub fn handle_post_generate_command(
             execute_commands(val, template_dir, template_source_dir, project_dir, template_data)?
         }
         Value::Object(ref commands_map) => {
-            if let Some(val) = commands_map.get(constants::TEMPLATE_OS_FLAG_ALL) {
+            if let Some(val) = commands_map.get(OS) {
                 execute_commands(val, template_dir, template_source_dir, project_dir, template_data)?;
             }
-            if let Some(val) = commands_map.get(OS) {
+
+            if let Some(val) = commands_map.get(constants::TEMPLATE_OS_FLAG_ALL) {
                 execute_commands(val, template_dir, template_source_dir, project_dir, template_data)?;
             }
         }
