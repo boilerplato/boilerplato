@@ -21,14 +21,3 @@ pub fn gen_source_code_from_template<P: AsRef<Path>, T: AsRef<str>>(project_dir:
             .context("Couldn't get the absolute project path")?,
     )
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_path() {
-        let p = PathBuf::from(std::env::current_dir().unwrap()).join("Cargo.toml");
-        println!("{:?}", p.canonicalize());
-    }
-}

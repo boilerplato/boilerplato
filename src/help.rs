@@ -31,7 +31,24 @@ Examples:
 }
 
 lazy_static! {
+    static ref SUB_COMMAND_SEARCH_EXAMPLES_HELP_TEXT: String = format!(
+        "\
+Examples:
+    {}
+    {}
+        ",
+        "$ boilerplato search nodejs".green(),
+        "$ boilerplato search rust".green()
+    );
+}
+
+lazy_static! {
     static ref APP_SHORT_USAGE_TEXT: String = format!("boilerplato {} [OPTIONS]", "<project-directory>".green());
+}
+
+lazy_static! {
+    static ref SUB_COMMAND_SEARCH_SHORT_USAGE_TEXT: String =
+        format!("boilerplato search {} [OPTIONS]", "<search-text>".green());
 }
 
 pub fn app_help_text() -> String {
@@ -40,4 +57,12 @@ pub fn app_help_text() -> String {
 
 pub fn app_short_usage_text() -> String {
     format!("{}", &*APP_SHORT_USAGE_TEXT)
+}
+
+pub fn sub_command_search_help_text() -> String {
+    format!("{}", &*SUB_COMMAND_SEARCH_EXAMPLES_HELP_TEXT)
+}
+
+pub fn sub_command_search_short_usage_text() -> String {
+    format!("{}", &*SUB_COMMAND_SEARCH_SHORT_USAGE_TEXT)
 }

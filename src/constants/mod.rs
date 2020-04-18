@@ -2,6 +2,11 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::ffi::OsStr;
 
+pub const APP_NAME: &'static str = env!("CARGO_PKG_NAME");
+pub const APP_VERSION: &'static str = env!("CARGO_PKG_VERSION");
+pub const APP_DESCRIPTION: &'static str = env!("CARGO_PKG_DESCRIPTION");
+pub const APP_AUTHOR: &'static str = "Rousan Ali <hello@rousan.io> (https://rousan.io)";
+
 pub const TEMPLATE_PREFIX_FILE: &'static str = "file:";
 pub const TEMPLATE_PREFIX_HTTPS: &'static str = "https:";
 pub const TEMPLATE_PREFIX_HTTP: &'static str = "http:";
@@ -33,6 +38,9 @@ pub const TEMPLATE_EXTRA_VAR_PROJECT_DIR_FULL_PATH: &'static str = "APP_FULL_PAT
 pub const TEMPLATE_EXTRA_VAR_PROJECT_DIR_REL_PATH: &'static str = "APP_REL_PATH";
 pub const TEMPLATE_EXTRA_VAR_TEMPLATE_PATH: &'static str = "TEMPLATE_PATH";
 pub const TEMPLATE_EXTRA_VAR_TEMPLATE_SOURCE_PATH: &'static str = "TEMPLATE_SOURCE_PATH";
+
+pub const SEARCH_REPO_GITHUB_API_ENDPOINT: &'static str = "https://api.github.com/search/repositories";
+pub const BOILERPLATO_GITHUB_HANDLE: &'static str = "boilerplato";
 
 lazy_static! {
     pub static ref RE_COMMA_SEPARATOR: Regex = Regex::new(r"[,\s]+").unwrap();
