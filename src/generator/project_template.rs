@@ -256,6 +256,7 @@ impl ProjectTemplate {
                 &template_data,
                 &template_engine,
             )?;
+            println!();
         }
 
         Ok(())
