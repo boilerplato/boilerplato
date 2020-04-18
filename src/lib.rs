@@ -6,6 +6,7 @@ mod error;
 pub mod generator;
 pub mod help;
 pub mod prelude;
+pub mod search;
 pub mod template_engine;
 pub mod types;
 pub mod utils;
