@@ -34,7 +34,7 @@ Visit [https://boilerplato.com](https://boilerplato.com/) for more info.
 
 ### Windows
 
-Please download it from [release](https://github.com/boilerplato/boilerplato/releases) page.
+Please download it from [releases](https://github.com/boilerplato/boilerplato/releases) page.
 
 
 ## Usage

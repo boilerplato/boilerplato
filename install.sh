@@ -15,7 +15,7 @@ CLONE_PATH="${CLONE_DIR}/${CLONE_FILE_NAME}"
 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   echo "Boilerplato ${LATEST_TAG}"
-  echo "Downlaoding artifact from ${LINUX_ARTIFACT}..."
+  echo "Downloading artifact from ${LINUX_ARTIFACT}..."
   curl -fsSL "${LINUX_ARTIFACT}" --output "${CLONE_PATH}"
   cd "${CLONE_DIR}"
   echo "Extracting..."
@@ -27,7 +27,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   cd "${PWD}"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   echo "Boilerplato ${LATEST_TAG}"
-  echo "Downlaoding artifact from ${MACOS_ARTIFACT}..."
+  echo "Downloading artifact from ${MACOS_ARTIFACT}..."
   curl -fsSL "${MACOS_ARTIFACT}" --output "${CLONE_PATH}"
   cd "${CLONE_DIR}"
   echo "Extracting..."
