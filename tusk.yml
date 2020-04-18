@@ -6,7 +6,7 @@ options:
 tasks:
   setup:
     run:
-      - command: cargo install cross
+      - command: cargo install --version 0.1.16 cross
       - command: go get github.com/aktau/github-release
   build:macos:
     run:
