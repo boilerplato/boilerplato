@@ -34,13 +34,13 @@ Visit [https://boilerplato.com](https://boilerplato.com/) for more info.
 
 ### Windows
 
-Please download it from [release](https://github.com/boilerplato/boilerplato/releases) page.
+Please download it from [releases](https://github.com/boilerplato/boilerplato/releases) page.
 
 
 ## Usage
 
 ```sh
-$ boilerplato <app_name> --template <tempate_name>
+$ boilerplato <app_name> --template <template_name>
 ```
 
 Available templates are hosted on: [https://github.com/boilerplato](https://github.com/boilerplato).

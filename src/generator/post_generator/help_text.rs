@@ -26,7 +26,7 @@ pub fn handle_post_generate_help_text(
             template_engine,
         )?,
         Value::Object(ref texts_map) => {
-            if let Some(val) = texts_map.get(constants::TEMPLATE_OS_FLAG_ALL) {
+            if let Some(val) = texts_map.get(OS) {
                 print_help_texts(
                     val,
                     template_dir,
@@ -36,7 +36,8 @@ pub fn handle_post_generate_help_text(
                     template_engine,
                 )?;
             }
-            if let Some(val) = texts_map.get(OS) {
+
+            if let Some(val) = texts_map.get(constants::TEMPLATE_OS_FLAG_ALL) {
                 print_help_texts(
                     val,
                     template_dir,
