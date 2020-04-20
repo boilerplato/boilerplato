@@ -20,7 +20,7 @@ Visit [https://boilerplato.com](https://boilerplato.com/) for more info.
 
 ## Install
 
-### Macos
+### macOS
 
 ```sh
  $ bash -c "$(curl -fsSL https://git.io/Jfv7y)"

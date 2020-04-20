@@ -6,7 +6,7 @@ lazy_static! {
         "\
 The {} can be one of:
     - a template published on https://github.com/boilerplato: e.g. {}
-    - a github repo under an username or an organization: e.g. {}
+    - a Github repo under an username or an organization: e.g. {}
     - a local template path relative to the current working directory: e.g. {}
     - any git repo having boilerplato.yml or boilerplato.json file: e.g. {}\n\n\
         ",
@@ -22,7 +22,7 @@ lazy_static! {
     static ref EXAMPLES_HELP_TEXT: String = format!(
         "\
 Examples:
-    - create a react app: {}
+    - create a react.js app: {}
     - create a Rust CLI app: {}\n\n\
         ",
         "$ boilerplato my-app --template react-nodejs-template".green(),
