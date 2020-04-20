@@ -38,7 +38,8 @@ pub fn gen_extra_template_data(
             .ok()
             .and_then(|cwd| pathdiff::diff_paths(project_dir, cwd.as_path()))
             .and_then(|p| p.to_str().map(|p| p.to_owned()))
-            .unwrap_or(String::new()),
+            .filter(|p| !p.is_empty())
+            .unwrap_or(String::from(".")),
     );
 
     map.insert(
