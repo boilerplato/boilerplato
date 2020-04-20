@@ -13,7 +13,7 @@ boilerplato my_app --template https://github.com/rousan/rust-cli-boilerplate.git
 # Install
 
 ```sh
-bash -c "$(curl -fsSL https://boilerplato.com/install)"
+bash -c "$(curl -fsSL https://boilerplato.com/install.sh)"
 ```
 
 # Use Template without installing Boilerplato

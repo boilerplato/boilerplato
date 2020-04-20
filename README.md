@@ -23,13 +23,13 @@ Visit [https://boilerplato.com](https://boilerplato.com/) for more info.
 ### macOS
 
 ```sh
- $ bash -c "$(curl -fsSL https://git.io/Jfv7y)"
+ $ bash -c "$(curl -fsSL https://boilerplato.com/install.sh)"
 ```
 
 ### Linux
 
 ```sh
- $ bash -c "$(curl -fsSL https://git.io/Jfv7y)"
+ $ bash -c "$(curl -fsSL https://boilerplato.com/install.sh)"
 ```
 
 ### Windows
