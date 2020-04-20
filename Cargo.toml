@@ -1,6 +1,6 @@
 [package]
 name = "boilerplato"
-version = "1.0.1"
+version = "1.0.2"
 description = "A powerful tool to generate boilerplate source code from a template."
 homepage = "https://boilerplato.com"
 repository = "https://github.com/boilerplato/boilerplato"

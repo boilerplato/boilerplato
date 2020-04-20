@@ -14,22 +14,22 @@
 
 A powerful tool to generate boilerplate source code from a template.
 
-> Let Boilerplato to create boilerplate source code and you focus on actual app logic.
+> Let Boilerplato create your boilerplate source code and you focus on actual app logic.
 
-Visit [https://boilerplato.com](https://boilerplato.com/) for more info.
+Visit [https://docs.boilerplato.com](https://docs.boilerplato.com/) for more info.
 
 ## Install
 
 ### macOS
 
 ```sh
- $ bash -c "$(curl -fsSL https://git.io/Jfv7y)"
+ $ bash -c "$(curl -fsSL https://boilerplato.com/install.sh)"
 ```
 
 ### Linux
 
 ```sh
- $ bash -c "$(curl -fsSL https://git.io/Jfv7y)"
+ $ bash -c "$(curl -fsSL https://boilerplato.com/install.sh)"
 ```
 
 ### Windows
