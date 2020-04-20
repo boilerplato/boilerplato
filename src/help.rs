@@ -22,7 +22,7 @@ lazy_static! {
     static ref EXAMPLES_HELP_TEXT: String = format!(
         "\
 Examples:
-    - create a react app: {}
+    - create a react.js app: {}
     - create a Rust CLI app: {}\n\n\
         ",
         "$ boilerplato my-app --template react-nodejs-template".green(),
