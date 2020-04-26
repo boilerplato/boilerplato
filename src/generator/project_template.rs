@@ -218,7 +218,7 @@ impl ProjectTemplate {
                                 entry_rel_path.to_str().unwrap_or("")
                             ))?;
 
-                        let check = dbg!(check.trim().to_lowercase());
+                        let check = check.trim().to_lowercase();
                         if check.is_empty() || check == "false" {
                             return Ok(true);
                         }
@@ -626,11 +626,6 @@ impl ProjectTemplate {
 
             let entry_new_name = name_generator(entry_rel_path, entry_file_name, &file_type)?;
             let rel_path_in_project_dir = rel_path_in_project_dir.join(entry_new_name);
-
-            println!(
-                "out: {:?} {:?} {:?}",
-                entry_rel_path, entry_file_name, rel_path_in_project_dir
-            );
 
             if file_type.is_dir() {
                 self.walk_template_dir(
