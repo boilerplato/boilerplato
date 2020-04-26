@@ -21,8 +21,11 @@ pub fn handle_post_generate_command(
             execute_commands(val, template_dir, template_source_dir, project_dir, template_data)?
         }
         Value::Object(ref commands_map) => {
-            if let Some(val) = commands_map.get(OS) {
-                execute_commands(val, template_dir, template_source_dir, project_dir, template_data)?;
+            for (key, val) in commands_map.iter() {
+                if let Some(_) = key.split("+").find(|p| p.trim() == OS) {
+                    execute_commands(val, template_dir, template_source_dir, project_dir, template_data)?;
+                    break;
+                }
             }
 
             if let Some(val) = commands_map.get(constants::TEMPLATE_OS_FLAG_ALL) {

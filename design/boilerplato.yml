@@ -61,6 +61,10 @@ postGenerate3:
   windows: "single command"
   linux: "single command"
 postGenerate4:
+  all: "command1"
+  macos + linux: "command1"
+  windows: "command1"
+postGenerate5:
   all:
     - "command1"
     - "command2"
