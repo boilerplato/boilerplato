@@ -18,7 +18,9 @@ pub struct TemplateConfig {
 #[serde(rename_all = "camelCase")]
 pub struct TemplateMeta {
     pub engine: String,
+    #[serde(default)]
     pub path: String,
+    #[serde(default)]
     pub extension: String,
 }
 

@@ -2,7 +2,7 @@ version: 1.0.0
 template:
   engine: handlebars
   path: "./templates"
-  extension: ".tpl"
+  extension: ".boiler"
 data:
 #  - name: appName [This data value will be set to $APP_NAME automatically, don't use it]
 #    type: string
