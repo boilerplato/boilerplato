@@ -26,15 +26,18 @@ pub fn handle_post_generate_help_text(
             template_engine,
         )?,
         Value::Object(ref texts_map) => {
-            if let Some(val) = texts_map.get(OS) {
-                print_help_texts(
-                    val,
-                    template_dir,
-                    template_source_dir,
-                    project_dir,
-                    template_data,
-                    template_engine,
-                )?;
+            for (key, val) in texts_map.iter() {
+                if let Some(_) = key.split("+").find(|p| p.trim() == OS) {
+                    print_help_texts(
+                        val,
+                        template_dir,
+                        template_source_dir,
+                        project_dir,
+                        template_data,
+                        template_engine,
+                    )?;
+                    break;
+                }
             }
 
             if let Some(val) = texts_map.get(constants::TEMPLATE_OS_FLAG_ALL) {

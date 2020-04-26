@@ -173,13 +173,10 @@ helpText3:
   all:
     - "text1"
     - "text2"
-  macos:
-    - "text1"
-    - "text2"
+  macos + linux:
+    - "text1 for macos and linux"
+    - "text2 for macos and linux"
   windows:
-    - "text1"
-    - "text2"
-  linux:
     - "text1"
     - "text2"
 
