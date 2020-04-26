@@ -88,3 +88,10 @@ data:
       required: false
       defaultValue: $APP_NAME
 ```
+
+# File ignoring level:
+1. constants::TEMPLATE_IGNORED_FILES
+2. .boilerplatoignore
+3. .gitignore
+4. check the `files` attribute in boilerplato.yml file
+5. if it's a file and check if it has its template file version

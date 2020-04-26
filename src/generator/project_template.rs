@@ -182,15 +182,15 @@ impl ProjectTemplate {
             }
         };
 
-        let ignore_checker = |entry_path: &Path| {
-            if let Some(file_name) = entry_path.file_name() {
+        let ignore_checker = |entry_full_path: &Path| {
+            if let Some(file_name) = entry_full_path.file_name() {
                 if constants::TEMPLATE_IGNORED_FILES.contains(&file_name) {
                     return true;
                 }
             }
 
             if let Some(ref f) = boilerplato_ignore_file_holder {
-                if let Some(ignored) = f.is_excluded(entry_path).ok() {
+                if let Some(ignored) = f.is_excluded(entry_full_path).ok() {
                     if ignored {
                         return true;
                     }
@@ -198,10 +198,24 @@ impl ProjectTemplate {
             }
 
             if let Some(ref f) = git_ignore_file_holder {
-                if let Some(ignored) = f.is_excluded(entry_path).ok() {
+                if let Some(ignored) = f.is_excluded(entry_full_path).ok() {
                     if ignored {
                         return true;
                     }
+                }
+            }
+
+            // @todo: Check files attribute in boilerplato.yml config
+
+            let template_versioned_of_file_exists = entry_full_path
+                .to_str()
+                .map(|p| format!("{}{}", p, template_meta.extension))
+                .map(|p| PathBuf::from(p))
+                .map(|p| p.exists());
+
+            if let Some(exists) = template_versioned_of_file_exists {
+                if exists {
+                    return true;
                 }
             }
 
