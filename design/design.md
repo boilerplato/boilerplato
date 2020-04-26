@@ -93,5 +93,8 @@ data:
 1. constants::TEMPLATE_IGNORED_FILES
 2. .boilerplatoignore
 3. .gitignore
-4. check the `files` attribute in boilerplato.yml file
+4. check the `files` attribute in boilerplato.yml file:
+    * if a file is not listed in `files`, it will be passed to next ignore checker
+    * if a file is listed and if its condition evaluates to falsy value, it will be ignored
+    * if a file is listed and if its condition evaluates to truthy value, it will be passed to ignore checker
 5. if it's a file and check if it has its template file version

@@ -2,6 +2,7 @@ use crate::constants;
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -10,6 +11,9 @@ pub struct TemplateConfig {
     pub template: TemplateMeta,
     #[serde(default)]
     pub data: Vec<TemplateData>,
+    pub files: Option<HashMap<String, Value>>,
+    #[serde(skip)]
+    pub files_map: Option<HashMap<String, CondFileMap>>,
     pub post_generate: Option<Value>,
     pub help_text: Option<Value>,
 }
@@ -53,6 +57,18 @@ pub enum TemplateDataType {
     Semver,
 }
 
+#[derive(Debug, Clone)]
+pub struct CondFileMap {
+    pub check: String,
+    pub new_name: Option<String>,
+}
+
+#[derive(Debug)]
+pub enum ConfigFileType {
+    JSON,
+    YAML,
+}
+
 impl TemplateDataType {
     pub fn default_value(&self) -> Value {
         match self {
@@ -64,11 +80,6 @@ impl TemplateDataType {
             TemplateDataType::Semver => Value::String(constants::TEMPLATE_TYPE_SEMVER_DEFAULT_VALUE.to_owned()),
         }
     }
-}
-
-pub enum ConfigFileType {
-    JSON,
-    YAML,
 }
 
 impl TemplateConfig {

@@ -5,7 +5,7 @@ use crate::generator::post_generator::{
 };
 use crate::prelude::*;
 use crate::template_engine::TemplateEngine;
-use crate::types::{ConfigFileType, TemplateConfig, TemplateData, TemplateDataType};
+use crate::types::{CondFileMap, ConfigFileType, TemplateConfig, TemplateData, TemplateDataType};
 use crate::utils;
 use colored::*;
 use serde_json::Value;
@@ -185,14 +185,14 @@ impl ProjectTemplate {
         let ignore_checker = |entry_full_path: &Path| {
             if let Some(file_name) = entry_full_path.file_name() {
                 if constants::TEMPLATE_IGNORED_FILES.contains(&file_name) {
-                    return true;
+                    return Ok(true);
                 }
             }
 
             if let Some(ref f) = boilerplato_ignore_file_holder {
                 if let Some(ignored) = f.is_excluded(entry_full_path).ok() {
                     if ignored {
-                        return true;
+                        return Ok(true);
                     }
                 }
             }
@@ -200,26 +200,46 @@ impl ProjectTemplate {
             if let Some(ref f) = git_ignore_file_holder {
                 if let Some(ignored) = f.is_excluded(entry_full_path).ok() {
                     if ignored {
-                        return true;
+                        return Ok(true);
                     }
                 }
             }
 
-            // @todo: Check files attribute in boilerplato.yml config
+            if let Some(ref files_map) = template_config.files_map {
+                if let Ok(entry_rel_path) = entry_full_path.strip_prefix(template_source_dir.as_path()) {
+                    let config = entry_rel_path.to_str().and_then(|s| files_map.get(&s.to_string()));
 
-            let template_versioned_of_file_exists = entry_full_path
-                .to_str()
-                .map(|p| format!("{}{}", p, template_meta.extension))
-                .map(|p| PathBuf::from(p))
-                .map(|p| p.exists());
+                    if let Some(config) = config {
+                        let check = template_engine
+                            .render_template(config.check.as_str(), &template_data)
+                            .context(format!(
+                                "Couldn't generate check condition for key in 'files' attribute: {}",
+                                entry_rel_path.to_str().unwrap_or("")
+                            ))?;
 
-            if let Some(exists) = template_versioned_of_file_exists {
-                if exists {
-                    return true;
+                        let check = check.trim().to_lowercase();
+                        if check.is_empty() || check == "false" {
+                            return Ok(true);
+                        }
+                    }
                 }
             }
 
-            return false;
+            if entry_full_path.is_file() {
+                let template_versioned_of_file_exists = entry_full_path
+                    .to_str()
+                    .map(|p| format!("{}{}", p, template_meta.extension))
+                    .map(|p| PathBuf::from(p))
+                    .map(|p| p.exists());
+
+                if let Some(exists) = template_versioned_of_file_exists {
+                    if exists {
+                        return Ok(true);
+                    }
+                }
+            }
+
+            return Ok(false);
         };
 
         println!();
@@ -316,15 +336,12 @@ impl ProjectTemplate {
             }
         }
 
-        let extra_data = gen_extra_template_data(
-            template_dir,
-            template_dir
-                .join(template_config.template.path.as_str())
-                .canonicalize()
-                .context("Template source not found")?
-                .as_path(),
-            project_dir,
-        );
+        let template_source_dir = template_dir
+            .join(template_config.template.path.as_str())
+            .canonicalize()
+            .context("Template source not found")?;
+
+        let extra_data = gen_extra_template_data(template_dir, template_source_dir.as_path(), project_dir);
         template_config
             .data
             .iter_mut()
@@ -339,6 +356,62 @@ impl ProjectTemplate {
                         Some(())
                     });
             });
+
+        if let Some(ref files) = template_config.files {
+            let mut files_map = HashMap::with_capacity(files.len());
+
+            for (key, val) in files.iter() {
+                let val = match val {
+                    Value::String(s) => CondFileMap {
+                        check: s.clone(),
+                        new_name: None,
+                    },
+                    Value::Object(m) => CondFileMap {
+                        check: m
+                            .get(&"check".to_owned())
+                            .and_then(|v| v.as_str())
+                            .map(|s| s.to_string())
+                            .ok_or_else(|| {
+                                crate::Error::new(format!(
+                                    "The 'files' doesn't have handlebars formatted 'check' condition for: {}",
+                                    key
+                                ))
+                            })?,
+                        new_name: m.get("newName").and_then(|v| v.as_str()).map(|s| s.to_string()),
+                    },
+                    _ => {
+                        return Err(crate::Error::new(
+                            "The 'files' allows only string or a map as condition",
+                        ))
+                    }
+                };
+
+                let files_path_key_full_path = template_source_dir
+                    .join(key)
+                    .canonicalize()
+                    .context(format!("A path key in 'files' attribute does not exist: {}", key))?;
+
+                let resolved_files_path_key_rel_path = files_path_key_full_path
+                    .strip_prefix(template_source_dir.as_path())
+                    .wrap()
+                    .and_then(|p| {
+                        p.to_str().ok_or_else(|| {
+                            crate::Error::new(
+                                "A path key relative path in 'files' attribute couldn't be converted into a string",
+                            )
+                        })
+                    })
+                    .map(|s| s.to_string())
+                    .context(format!(
+                        "Failed to retrieve relative path for a key in 'files' attribute: {}",
+                        key
+                    ))?;
+
+                files_map.insert(resolved_files_path_key_rel_path, val);
+            }
+
+            template_config.files_map = Some(files_map);
+        }
 
         Ok(())
     }
@@ -467,7 +540,7 @@ impl ProjectTemplate {
             .context(format!("Invalid config file in the provided template: {}", file_name))
     }
 
-    fn walk_template_dir<T: AsRef<Path>, F: Fn(&Path) -> crate::Result<()>, I: Fn(&Path) -> bool>(
+    fn walk_template_dir<T: AsRef<Path>, F: Fn(&Path) -> crate::Result<()>, I: Fn(&Path) -> crate::Result<bool>>(
         &self,
         template_source_dir: T,
         ignore_checker: &I,
@@ -483,9 +556,12 @@ impl ProjectTemplate {
             ))?;
             let entry_full_path = entry.path();
 
-            if ignore_checker(entry_full_path.as_path()) {
+            if ignore_checker(entry_full_path.as_path())? {
                 continue;
             }
+
+            // @todo: calculate new name for the current path
+            // and calculate new relative path for the current path that will be use in actual project dir
 
             let file_type = entry.file_type().context(format!(
                 "Failed to fetch entry metadata: {}",
