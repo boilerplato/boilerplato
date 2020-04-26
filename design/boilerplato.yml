@@ -51,6 +51,78 @@ data:
     message: "Please enter initial app version: "
     required: false
     defaultValue: "1.0.0"
+files:
+  "./src/a-with-cond": "{{ cond }}"
+  "./src/a-with-cond/b-with-cond2": "{{ and cond cond2 }}"
+  "./src/a-with-cond/b-without-cond2": "{{ and cond (not cond2) }}"
+  "./src/a-without-cond": "{{ not cond }}"
+  "./src/a-without-cond/b-with-cond2": "{{ and (not cond) cond2 }}"
+  "./src/a-without-cond/b-without-cond2": "{{ and (not cond) (not cond2) }}"
+files1:
+  "./README":
+    check: "{{ cond }}"
+    newName: "README.md"
+  "./src":
+    check: "{{ cond }}"
+  "./src/a-with-cond":
+    check: "{{ cond }}"
+    newName: "a"
+  "./src/a-with-cond/b-with-cond2":
+    check: "{{ and cond cond2 }}"
+    newName: "b"
+  "./src/a-with-cond/b-without-cond2":
+    check: "{{ and cond (not cond2) }}"
+    newName: "b"
+  "./src/a-without-cond":
+    check: "{{ not cond }}"
+    newName: "a"
+  "./src/a-without-cond/b-with-cond2":
+    check: "{{ and (not cond) cond2 }}"
+    newName: b
+  "./src/a-without-cond/b-without-cond2":
+    check: "{{ and (not cond) (not cond2) }}"
+    newName: "b"
+files2:
+  "./src/a-with-cond":
+    check: "{{ cond }}"
+    newName: "a-{{ appName }}"
+  "./src/a-with-cond/b-with-cond2":
+    check: "{{ and cond cond2 }}"
+    newName: "b-{{ appName }}"
+  "./src/a-with-cond/b-without-cond2":
+    check: "{{ and cond (not cond2) }}"
+    newName: "b-{{ appName }}"
+  "./src/a-without-cond":
+    check: "{{ not cond }}"
+    newName: "a-{{ appName }}"
+  "./src/a-without-cond/b-with-cond2":
+    check: "{{ and (not cond) cond2 }}"
+    newName: "b-{{ appName }}"
+  "./src/a-without-cond/b-without-cond2":
+    check: "{{ and (not cond) (not cond2) }}"
+    newName: "b-{{ appName }}"
+files3:
+  "./src/a-with-cond/":
+    check: "{{ cond }}"
+    newName: "a-{{ appName }}"
+  "./src/a-with-cond/b-with-cond2":
+    check: "{{ and cond cond2 }}"
+    newName: "b-{{ appName }}"
+  "src/a-with-cond/b-with-cond2/op.js":
+    check: "{{ and cond (and cond2 cond3) }}"
+    newName: op2222.js
+  "./src/a-with-cond/b-without-cond2":
+    check: "{{ and cond (not cond2) }}"
+    newName: "b-{{ appName }}"
+  "./src/a-without-cond":
+    check: "{{ not cond }}"
+    newName: "a-{{ appName }}"
+  "./src/a-without-cond/b-with-cond2":
+    check: "{{ and (not cond) cond2 }}"
+    newName: "b-{{ appName }}"
+  "./src/a-without-cond/b-without-cond2":
+    check: "{{ and (not cond) (not cond2) }}"
+    newName: "b-{{ appName }}"
 postGenerate: "single command ${appVersion}"
 postGenerate2:
   - 'echo "I can use template data here: $appName"'
