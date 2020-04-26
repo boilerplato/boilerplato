@@ -3,7 +3,7 @@
   "template": {
     "engine": "handlebars",
     "path": "./templates",
-    "extension": ".tpl"
+    "extension": ".boiler"
   },
   "data": [
     {

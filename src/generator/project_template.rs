@@ -5,13 +5,14 @@ use crate::generator::post_generator::{
 };
 use crate::prelude::*;
 use crate::template_engine::TemplateEngine;
-use crate::types::{ConfigFileType, TemplateConfig, TemplateData, TemplateDataType};
+use crate::types::{CondFileMap, ConfigFileType, TemplateConfig, TemplateData, TemplateDataType};
 use crate::utils;
 use colored::*;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::env;
 use std::fs;
+use std::fs::FileType;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use url::Url;
@@ -182,30 +183,64 @@ impl ProjectTemplate {
             }
         };
 
-        let ignore_checker = |entry_path: &Path| {
-            if let Some(file_name) = entry_path.file_name() {
+        let ignore_checker = |entry_full_path: &Path| {
+            if let Some(file_name) = entry_full_path.file_name() {
                 if constants::TEMPLATE_IGNORED_FILES.contains(&file_name) {
-                    return true;
+                    return Ok(true);
                 }
             }
 
             if let Some(ref f) = boilerplato_ignore_file_holder {
-                if let Some(ignored) = f.is_excluded(entry_path).ok() {
+                if let Some(ignored) = f.is_excluded(entry_full_path).ok() {
                     if ignored {
-                        return true;
+                        return Ok(true);
                     }
                 }
             }
 
             if let Some(ref f) = git_ignore_file_holder {
-                if let Some(ignored) = f.is_excluded(entry_path).ok() {
+                if let Some(ignored) = f.is_excluded(entry_full_path).ok() {
                     if ignored {
-                        return true;
+                        return Ok(true);
                     }
                 }
             }
 
-            return false;
+            if let Some(ref files_map) = template_config.files_map {
+                if let Ok(entry_rel_path) = entry_full_path.strip_prefix(template_source_dir.as_path()) {
+                    let config = entry_rel_path.to_str().and_then(|s| files_map.get(&s.to_string()));
+
+                    if let Some(config) = config {
+                        let check = template_engine
+                            .render_template(config.check.as_str(), &template_data)
+                            .context(format!(
+                                "Couldn't generate check condition for key in 'files' attribute: {}",
+                                entry_rel_path.to_str().unwrap_or("")
+                            ))?;
+
+                        let check = check.trim().to_lowercase();
+                        if check.is_empty() || check == "false" {
+                            return Ok(true);
+                        }
+                    }
+                }
+            }
+
+            if entry_full_path.is_file() {
+                let template_versioned_of_file_exists = entry_full_path
+                    .to_str()
+                    .map(|p| format!("{}{}", p, template_meta.extension))
+                    .map(|p| PathBuf::from(p))
+                    .map(|p| p.exists());
+
+                if let Some(exists) = template_versioned_of_file_exists {
+                    if exists {
+                        return Ok(true);
+                    }
+                }
+            }
+
+            return Ok(false);
         };
 
         println!();
@@ -215,17 +250,54 @@ impl ProjectTemplate {
         //     project_dir.to_str().unwrap_or("").green()
         // );
 
-        self.walk_template_dir(template_source_dir.as_path(), &ignore_checker, &|entry_full_path| {
-            self.gen_a_single_code_file(
-                template_source_dir.as_path(),
-                project_dir,
-                entry_full_path,
-                template_meta.extension.as_str(),
-                &template_engine,
-                &template_data,
-            )?;
-            Ok(())
-        })?;
+        self.walk_template_dir(
+            template_source_dir.as_path(),
+            &ignore_checker,
+            &|entry_full_path, rel_path_in_project_dir| {
+                self.gen_a_single_code_file(
+                    template_source_dir.as_path(),
+                    project_dir,
+                    entry_full_path,
+                    rel_path_in_project_dir,
+                    template_meta.extension.as_str(),
+                    &template_engine,
+                    &template_data,
+                )?;
+                Ok(())
+            },
+            &|entry_rel_path, entry_file_name, file_type| {
+                if let Some(ref files_map) = template_config.files_map {
+                    if let Some(rel_path_str) = entry_rel_path.to_str() {
+                        let new_name_template = files_map.get(rel_path_str).and_then(|cond| cond.new_name.as_ref());
+
+                        if let Some(new_name_template) = new_name_template {
+                            return template_engine
+                                .render_template(new_name_template.as_str(), &template_data)
+                                .context(format!(
+                                    "Couldn't generate new name for key in 'files' attribute: {}",
+                                    rel_path_str
+                                ));
+                        }
+                    }
+                }
+
+                if file_type.is_dir() {
+                    return Ok(entry_file_name.to_string());
+                }
+
+                let template_file_extension = template_meta.extension.as_str();
+                let entry_file_name_without_template_extension = entry_rel_path
+                    .extension()
+                    .and_then(|ext| ext.to_str())
+                    .and_then(|ext| utils::or(ext == &template_file_extension[1..], Some(()), None))
+                    .map(|_| &entry_file_name[..(entry_file_name.len() - template_file_extension.len())])
+                    .unwrap_or(entry_file_name);
+
+                Ok(entry_file_name_without_template_extension.to_string())
+            },
+            template_source_dir.as_path(),
+            Path::new(""),
+        )?;
 
         self.initialize_git_to_project_dir(project_dir)?;
 
@@ -302,15 +374,12 @@ impl ProjectTemplate {
             }
         }
 
-        let extra_data = gen_extra_template_data(
-            template_dir,
-            template_dir
-                .join(template_config.template.path.as_str())
-                .canonicalize()
-                .context("Template source not found")?
-                .as_path(),
-            project_dir,
-        );
+        let template_source_dir = template_dir
+            .join(template_config.template.path.as_str())
+            .canonicalize()
+            .context("Template source not found")?;
+
+        let extra_data = gen_extra_template_data(template_dir, template_source_dir.as_path(), project_dir);
         template_config
             .data
             .iter_mut()
@@ -326,35 +395,88 @@ impl ProjectTemplate {
                     });
             });
 
+        if let Some(ref files) = template_config.files {
+            let mut files_map = HashMap::with_capacity(files.len());
+
+            for (key, val) in files.iter() {
+                let val = match val {
+                    Value::String(s) => CondFileMap {
+                        check: s.clone(),
+                        new_name: None,
+                    },
+                    Value::Object(m) => CondFileMap {
+                        check: m
+                            .get(&"check".to_owned())
+                            .and_then(|v| v.as_str())
+                            .map(|s| s.to_string())
+                            .ok_or_else(|| {
+                                crate::Error::new(format!(
+                                    "The 'files' doesn't have handlebars formatted 'check' condition for: {}",
+                                    key
+                                ))
+                            })?,
+                        new_name: m.get("newName").and_then(|v| v.as_str()).map(|s| s.to_string()),
+                    },
+                    _ => {
+                        return Err(crate::Error::new(
+                            "The 'files' allows only string or a map as condition",
+                        ))
+                    }
+                };
+
+                let files_path_key_full_path = template_source_dir
+                    .join(key)
+                    .canonicalize()
+                    .context(format!("A path key in 'files' attribute does not exist: {}", key))?;
+
+                let resolved_files_path_key_rel_path = files_path_key_full_path
+                    .strip_prefix(template_source_dir.as_path())
+                    .wrap()
+                    .and_then(|p| {
+                        p.to_str().ok_or_else(|| {
+                            crate::Error::new(
+                                "A path key relative path in 'files' attribute couldn't be converted into a string",
+                            )
+                        })
+                    })
+                    .map(|s| s.to_string())
+                    .context(format!(
+                        "Failed to retrieve relative path for a key in 'files' attribute: {}",
+                        key
+                    ))?;
+
+                files_map.insert(resolved_files_path_key_rel_path, val);
+            }
+
+            template_config.files_map = Some(files_map);
+        }
+
         Ok(())
     }
 
     fn gen_a_single_code_file(
         &self,
-        template_source_dir: &Path,
+        _template_source_dir: &Path,
         project_dir: &Path,
         template_file_full_path: &Path,
+        template_file_rel_path_in_project_dir: &Path,
         template_file_extension: &str,
         template_engine: &TemplateEngine,
         template_data: &HashMap<&str, Value>,
     ) -> crate::Result<()> {
-        let template_file_rel_path = template_file_full_path.strip_prefix(template_source_dir).wrap()?;
-        let (is_template_file, template_file_rel_path_without_template_extension) = template_file_rel_path
+        let is_template_file = template_file_full_path
             .extension()
             .and_then(|ext| ext.to_str())
             .and_then(|ext| utils::or(ext == &template_file_extension[1..], Some(()), None))
-            .and_then(|_| template_file_rel_path.to_str())
-            .map(|rel_path| Path::new(&rel_path[..(rel_path.len() - template_file_extension.len())]))
-            .map(|rel_path| (true, rel_path))
-            .unwrap_or((false, template_file_rel_path));
+            .is_some();
 
         println!(
             "{} {}",
             "Generating".green(),
-            template_file_rel_path_without_template_extension.to_str().unwrap_or("")
+            template_file_rel_path_in_project_dir.to_str().unwrap_or("")
         );
 
-        let project_actual_file_path = project_dir.join(template_file_rel_path_without_template_extension);
+        let project_actual_file_path = project_dir.join(template_file_rel_path_in_project_dir);
         if let Some(parent) = project_actual_file_path.parent() {
             fs::create_dir_all(parent).context(format!(
                 "Couldn't create the missing project dir: {}",
@@ -391,9 +513,10 @@ impl ProjectTemplate {
         }
 
         if !is_template_file {
-            fs::copy(template_file_full_path, project_actual_file_path).context(format!(
-                "Failed to copy the template file: {}",
-                template_file_full_path.to_str().unwrap_or("")
+            fs::copy(template_file_full_path, project_actual_file_path.as_path()).context(format!(
+                "Failed to copy the template file: {} to project file: {}",
+                template_file_full_path.to_str().unwrap_or(""),
+                project_actual_file_path.to_str().unwrap_or("")
             ))?;
         } else {
             let template_text = fs::read_to_string(template_file_full_path).context(format!(
@@ -453,35 +576,68 @@ impl ProjectTemplate {
             .context(format!("Invalid config file in the provided template: {}", file_name))
     }
 
-    fn walk_template_dir<T: AsRef<Path>, F: Fn(&Path) -> crate::Result<()>, I: Fn(&Path) -> bool>(
+    fn walk_template_dir<
+        T: AsRef<Path>,
+        F: Fn(&Path, &Path) -> crate::Result<()>,
+        I: Fn(&Path) -> crate::Result<bool>,
+        N: Fn(&Path, &str, &FileType) -> crate::Result<String>,
+    >(
         &self,
-        template_source_dir: T,
+        template_source_curr_walking_dir: T,
         ignore_checker: &I,
         walker: &F,
+        name_generator: &N,
+        template_source_dir: &Path,
+        rel_path_in_project_dir: &Path,
     ) -> crate::Result<()> {
-        let template_source_dir = template_source_dir.as_ref();
-        let path_str = template_source_dir.to_str().unwrap_or("");
+        let template_source_curr_walking_dir = template_source_curr_walking_dir.as_ref();
+        let path_str = template_source_curr_walking_dir.to_str().unwrap_or("");
 
-        for entry in fs::read_dir(template_source_dir).context(format!("Failed to walk template dir: {}", path_str))? {
+        for entry in fs::read_dir(template_source_curr_walking_dir)
+            .context(format!("Failed to walk template dir: {}", path_str))?
+        {
             let entry = entry.context(format!(
                 "Failed to fetch an entry details in template dir: {}",
                 path_str
             ))?;
-            let entry_full_path = entry.path();
 
-            if ignore_checker(entry_full_path.as_path()) {
+            let entry_full_path = entry.path();
+            let entry_full_path_str = entry_full_path.to_str().unwrap_or("");
+
+            if ignore_checker(entry_full_path.as_path())? {
                 continue;
             }
 
-            let file_type = entry.file_type().context(format!(
-                "Failed to fetch entry metadata: {}",
-                entry_full_path.to_str().unwrap_or("")
+            let file_type = entry
+                .file_type()
+                .context(format!("Failed to fetch entry metadata: {}", entry_full_path_str))?;
+
+            let entry_rel_path = entry_full_path.strip_prefix(template_source_dir).context(format!(
+                "Couldn't get rel path for a template file: {}",
+                entry_full_path_str
             ))?;
 
+            let entry_file_name = entry_full_path.file_name().and_then(|n| n.to_str()).ok_or_else(|| {
+                crate::Error::new(format!(
+                    "Couldn't get file name for a template file: {}",
+                    entry_full_path_str
+                ))
+            })?;
+
+            let entry_new_name = name_generator(entry_rel_path, entry_file_name, &file_type)?;
+            let rel_path_in_project_dir = rel_path_in_project_dir.join(entry_new_name);
+
             if file_type.is_dir() {
-                self.walk_template_dir(entry_full_path.as_path(), ignore_checker, walker)?;
+                self.walk_template_dir(
+                    entry_full_path.as_path(),
+                    ignore_checker,
+                    walker,
+                    name_generator,
+                    template_source_dir,
+                    rel_path_in_project_dir.as_path(),
+                )?;
             } else {
-                walker(entry_full_path.as_path())?;
+                walker(entry_full_path.as_path(), rel_path_in_project_dir.as_path())?;
             }
         }
 

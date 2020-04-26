@@ -27,7 +27,7 @@ pub const TEMPLATE_TYPE_BOOL_POSSIBLE_FALSY_INPUTS: [&'static str; 2] = ["no", "
 
 pub const TEMPLATE_TYPE_SEMVER_DEFAULT_VALUE: &'static str = "1.0.0";
 pub const TEMPLATE_DEFAULT_TEMPLATE_PATH: &'static str = ".";
-pub const TEMPLATE_DEFAULT_FILE_EXTENSION: &'static str = ".tpl";
+pub const TEMPLATE_DEFAULT_FILE_EXTENSION: &'static str = ".boiler";
 
 pub const TEMPLATE_DATA_APP_NAME: &'static str = "appName";
 

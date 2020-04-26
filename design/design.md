@@ -88,3 +88,19 @@ data:
       required: false
       defaultValue: $APP_NAME
 ```
+
+# File ignoring level:
+1. constants::TEMPLATE_IGNORED_FILES
+2. .boilerplatoignore
+3. .gitignore
+4. check the `files` attribute in boilerplato.yml file:
+    * if a file is not listed in `files`, it will be passed to next ignore checker
+    * if a file is listed and if its condition evaluates to falsy value, it will be ignored
+    * if a file is listed and if its condition evaluates to truthy value, it will be passed to next ignore checker
+5. if it's a file and check if it has its template file version
+
+# File new name in generated project (if the file is not ignored): steps
+1. If the file/folder's new name is specified in the `files` attribute, that new name will be used; and if it's specified in `files` attribute but it's `newName` is missing, it will calculate name from `step-2`.
+2. if it's a folder, its original name will be used.
+3. if it's a file and it ends with `.boiler` or the specified extension, its stripped name will be used, e.g. `main.js.boiler` will be `main.js`.
+4. if it's a file and it does not end with `.boiler` or the specified extension, its original name will be used.
