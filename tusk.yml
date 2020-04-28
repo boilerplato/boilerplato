@@ -35,11 +35,6 @@ tasks:
   upload-artifacts:
     run:
       command: chmod +x scripts/upload-artifacts.sh && ./scripts/upload-artifacts.sh ${version}
-  confirm:
-    args:
-      message:
-        usage: The confirmation message
-    run: echo "\n${message}\n" && read confirmation
   release:
     run:
       - releez "${version}"
